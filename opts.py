@@ -2,6 +2,7 @@ import argparse
 import torch
 import os
 import math
+import importlib
 
 class opts:
 	def parse(self):
@@ -39,8 +40,8 @@ class opts:
 		parser.add_argument('--momentum',        default=0.9,            type=float, help='momentum')
 		parser.add_argument('--weightDecay',     default=1e-4,           type=float, help='weight decay')
 	    # Model options
-		parser.add_argument('--netType',         default='CNN',          type=str,   help='ANN type', choices=['CNN'])
-		parser.add_argument('--netSpec',         default='CNN',          type=str,   help='ANN Spec', choices=['CNN'])
+		parser.add_argument('--netType',         default='cnn',          type=str,   help='ANN type', choices=['CNN'])
+		parser.add_argument('--netSpec',         default='cnn',          type=str,   help='ANN Spec', choices=['CNN'])
 		parser.add_argument('--pretrain',        default='none',         type=str,   help='pretrain', choices=['none','default'])
 		parser.add_argument('--absLoss',         default=0,              type=float, help='Weight for abs derender criterion')
 		parser.add_argument('--mseLoss',         default=1,              type=float, help='Weight for mse derender criterion')
@@ -67,10 +68,11 @@ class opts:
 		torch.manual_seed(self.args.manualSeed)
 
 		if self.args.dataset == 'pku':
-			pass
-		#import 
+			self.args.numEntry = 10
+			self.args.maxXmlLen = 4 # heading dir, lat pos, lat speed, ID
+		# criterions = importlib.import_module('datasets.'+self.args.dataset+'-criterion')
 		
-		if self.args.netType == 'CNN':
+		if self.args.netType == 'cnn':
 			self.args.optputSize = 4
 		
 		if self.args.netType == 'cnnSVM':
@@ -88,12 +90,11 @@ class opts:
 		if self.args.resetClassifier:
 			assert self.args.nClasses != 0 , 'nClasses required when resetClassifier is set'
 
-
 		self.args.hashKey = self.args.dataset+'_'+self.args.netType+'_'+self.args.netSpec+'_'+'pretrain='+self.args.pretrain+'_'+ \
 			'Loss='+str(self.args.absLoss)+'-'+str(self.args.mseLoss)+'-'+str(self.args.gdlLoss)+'-'+str(self.args.customLoss)+'_'+\
 			'LR='+str(self.args.LR)+'_'+'Suffix='+self.args.suffix
 
-		self.args.dataRoot = self.args.dataset
+		self.args.dataRoot = self.args.data
 		self.args.data = os.path.join(self.args.data, self.args.dataset)
 		self.args.gen = os.path.join(self.args.gen, self.args.dataset)
 		self.args.resume = os.path.join(self.args.resume, self.args.hashKey)
