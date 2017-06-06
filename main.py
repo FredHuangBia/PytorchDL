@@ -1,13 +1,21 @@
 from opts import *
 
 if __name__=='__main__':
-	opt = opts()
+	opt = opts().args
 
 	models = importlib.import_module('models.init')
-	#criterion
-	DataLoader = importlib.import_module('models.' + opt.args.netType + '-dataloader')
+	DataLoader = importlib.import_module('models.' + opt.netType + '-dataloader')
+	checkpoints = importlib.import_module('checkpoints')
+	# criterions = importlib.import_module('criterions.init')
+	# Trainer = importlib.import_module('models.' + opt.netType + '-train')
 
 	print('=> Setting up data loader')
-	DataLoaders = DataLoader.create(opt)
-	# trainLoader = DataLoaders[0]
-	# valLoader = DataLoaders[1]
+	trainLoader, valLoader = DataLoader.create(opt)
+
+	print('=> Checking checkpoints')
+	checkpoint = checkpoints.load(opt)
+
+
+
+	# for i, (data, xml) in enumerate(trainLoader):
+	# 	print(data)

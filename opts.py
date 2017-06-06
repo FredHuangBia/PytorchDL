@@ -27,7 +27,7 @@ class opts:
 		parser.add_argument('--nEpochs',         default=50,             type=int,   help='Number of total epochs to run')
 		parser.add_argument('--epochNum',        default=0,              type=int,   help='0=retrain|-1=latest|-2=best', choices=[0,-1,-2])
 		parser.add_argument('--saveEpoch',       default=10,             type=int,   help='saving at least # epochs')
-		parser.add_argument('--batchSize',       default=16,             type=int,   help='mini-batch size')
+		parser.add_argument('--batchSize',       default=3,              type=int,   help='mini-batch size')
 		parser.add_argument('--testOnly',        default=False,          type=bool,  help='Run on validation set only')
 		parser.add_argument('--visTrain',        default=3,              type=int,   help='Visualizing training examples in unit of batchsize')
 		parser.add_argument('--visTest',         default=3,              type=int,   help='Visualizing testing examples in unit of batchsize')
@@ -69,11 +69,12 @@ class opts:
 
 		if self.args.dataset == 'pku':
 			self.args.numEntry = 10
+			self.args.dataSize = [4]
 			self.args.maxXmlLen = 4 # heading dir, lat pos, lat speed, ID
 		# criterions = importlib.import_module('datasets.'+self.args.dataset+'-criterion')
 		
 		if self.args.netType == 'cnn':
-			self.args.optputSize = 4
+			self.args.outputSize = 4
 		
 		if self.args.netType == 'cnnSVM':
 			opt.nEpochs = 1
