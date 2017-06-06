@@ -15,7 +15,10 @@ if __name__=='__main__':
 	print('=> Checking checkpoints')
 	checkpoint = checkpoints.load(opt)
 
+	print('=> Setting up model and criterion')
+	model, optimState = models.setup(opt, checkpoint, valLoader)
+	# criterion = criterions.setup(opt, checkpoint, model) -- netType-criterion.createCriterion(opt, model)
 
-
+	
 	# for i, (data, xml) in enumerate(trainLoader):
 	# 	print(data)

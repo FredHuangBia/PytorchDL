@@ -29,6 +29,7 @@ class opts:
 		parser.add_argument('--saveEpoch',       default=10,             type=int,   help='saving at least # epochs')
 		parser.add_argument('--batchSize',       default=3,              type=int,   help='mini-batch size')
 		parser.add_argument('--testOnly',        default=False,          type=bool,  help='Run on validation set only')
+		parser.add_argument('--visEpoch',        default=10,             type=int,   help='Visualizing every n epochs')
 		parser.add_argument('--visTrain',        default=3,              type=int,   help='Visualizing training examples in unit of batchsize')
 		parser.add_argument('--visTest',         default=3,              type=int,   help='Visualizing testing examples in unit of batchsize')
 		parser.add_argument('--visWidth',        default=-1,             type=int,   help='# images per row for visualization')
@@ -40,8 +41,8 @@ class opts:
 		parser.add_argument('--momentum',        default=0.9,            type=float, help='momentum')
 		parser.add_argument('--weightDecay',     default=1e-4,           type=float, help='weight decay')
 	    # Model options
-		parser.add_argument('--netType',         default='cnn',          type=str,   help='ANN type', choices=['CNN'])
-		parser.add_argument('--netSpec',         default='cnn',          type=str,   help='ANN Spec', choices=['CNN'])
+		parser.add_argument('--netType',         default='CNN',          type=str,   help='ANN type', choices=['CNN','MCCNN'])
+		parser.add_argument('--netSpec',         default='CNN',          type=str,   help='ANN Spec', choices=['CNN'])
 		parser.add_argument('--pretrain',        default='none',         type=str,   help='pretrain', choices=['none','default'])
 		parser.add_argument('--absLoss',         default=0,              type=float, help='Weight for abs derender criterion')
 		parser.add_argument('--mseLoss',         default=1,              type=float, help='Weight for mse derender criterion')
@@ -62,7 +63,7 @@ class opts:
 	def __init__(self):
 		self.parse()
 		self.args.GPUs = self.args.GPUs.split(',')
-		self.args.nGPU = len(self.args.GPUs)
+		self.args.nGPUs = len(self.args.GPUs)
 
 		torch.set_default_tensor_type('torch.FloatTensor')
 		torch.manual_seed(self.args.manualSeed)
@@ -72,7 +73,17 @@ class opts:
 			self.args.dataSize = [4]
 			self.args.maxXmlLen = 4 # heading dir, lat pos, lat speed, ID
 		# criterions = importlib.import_module('datasets.'+self.args.dataset+'-criterion')
-		
+		elif self.args.dataset == 'EKF2':
+			self.args.numEntry = 34947
+			self.args.dataSize = [3,21]
+			self.args.maxXmlLen = 5 # lat pos*4, ID
+		# criterions = importlib.import_module('datasets.'+self.args.dataset+'-criterion')
+		elif self.args.dataset == 'EKF4':
+			self.args.numEntry = 34927
+			self.args.dataSize = [3,41]
+			self.args.maxXmlLen = 5 # lat pos*4, ID
+		# criterions = importlib.import_module('datasets.'+self.args.dataset+'-criterion')
+
 		if self.args.netType == 'cnn':
 			self.args.outputSize = 4
 		

@@ -29,6 +29,9 @@ def load(opt):
 		return loaded
 
 def save(epoch, model, criterion, optimState, bestModel, opt):
+	# if torch.type(model) == 'nn.DataParallelTable':
+	# 	model = model.get(0)
+
 	if bestModel or (epoch % opt.saveEpoch == 0):
 		modelFile = 'model_' + str(epoch) + '.pth'
 		criterionFile = 'criterion_' + str(epoch) + '.pth'
