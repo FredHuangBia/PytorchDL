@@ -4,7 +4,7 @@ import torch
 import os
 import torchvision.transforms as t
 
-class pkuDataset(Dataset):
+class exampleDataset(Dataset):
 	def __init__(self, info, opt, split):
 		self.split = split
 		self.dataInfo = info[split]
@@ -49,6 +49,6 @@ class pkuDataset(Dataset):
 
 
 def getInstance(info, opt, split):
-	myInstance = pkuDataset(info, opt, split)
+	myInstance = exampleDataset(info, opt, split)
 	# myInstance.__getitem__(0)
 	return myInstance

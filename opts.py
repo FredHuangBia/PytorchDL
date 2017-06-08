@@ -20,7 +20,7 @@ class opts:
 		parser.add_argument('--www',             default='../../www',    type=str,   help='Path to visualization' )
 	 	# Data options
 		parser.add_argument('--nThreads',        default=4,              type=int,   help='Number of data loading threads' )
-		parser.add_argument('--dataset',         default='pku',          type=str,   help='Name of dataset' ,choices=['pku'])
+		parser.add_argument('--dataset',         default='example',          type=str,   help='Name of dataset' ,choices=['pku'])
 		parser.add_argument('--maxImgs',         default=10000,          type=int,   help='Number of images in train+val')
 		parser.add_argument('--trainPctg',       default=0.95,           type=float, help='Percentage of training images')
 	    # Training/testing options
@@ -41,7 +41,7 @@ class opts:
 		parser.add_argument('--momentum',        default=0.9,            type=float, help='momentum')
 		parser.add_argument('--weightDecay',     default=1e-4,           type=float, help='weight decay')
 	    # Model options
-		parser.add_argument('--netType',         default='CNN',          type=str,   help='ANN type', choices=['CNN','MCCNN'])
+		parser.add_argument('--netType',         default='example',          type=str,   help='ANN type', choices=['CNN','MCCNN'])
 		parser.add_argument('--netSpec',         default='CNN',          type=str,   help='ANN Spec', choices=['CNN'])
 		parser.add_argument('--pretrain',        default='none',         type=str,   help='pretrain', choices=['none','default'])
 		parser.add_argument('--absLoss',         default=0,              type=float, help='Weight for abs derender criterion')
@@ -74,12 +74,12 @@ class opts:
 			self.args.maxXmlLen = 4 # heading dir, lat pos, lat speed, ID
 		# criterions = importlib.import_module('datasets.'+self.args.dataset+'-criterion')
 		elif self.args.dataset == 'EKF2':
-			self.args.numEntry = 34947
+			self.args.numEntry = 29799
 			self.args.dataSize = [3,21]
 			self.args.maxXmlLen = 5 # lat pos*4, ID
 		# criterions = importlib.import_module('datasets.'+self.args.dataset+'-criterion')
 		elif self.args.dataset == 'EKF4':
-			self.args.numEntry = 34927
+			self.args.numEntry = 28879
 			self.args.dataSize = [3,41]
 			self.args.maxXmlLen = 5 # lat pos*4, ID
 		# criterions = importlib.import_module('datasets.'+self.args.dataset+'-criterion')
