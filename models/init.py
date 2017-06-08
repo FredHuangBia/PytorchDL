@@ -37,7 +37,7 @@ def setup(opt, checkpoint, valLoader):
 	if opt.nGPUs > 1:
 		gpus = opt.GPUs
 		fastest, benchmark = cudnn.fastest, cudnn.benchmark
-		# TODO
+		# TODO  make a dataparallel to split data on different GPUs
 
 	optimState = None
 	if checkpoint != None:
