@@ -3,6 +3,7 @@ import torch.backends.cudnn as cudnn
 import torch
 import os
 import importlib
+from torch.nn.parallel.data_parallel import DataParallel
 
 def setup(opt, checkpoint, valLoader):
 	model = None
@@ -16,8 +17,8 @@ def setup(opt, checkpoint, valLoader):
 		models = importlib.import_module('models.' + opt.netType)
 		model = models.createModel(opt)
 
-	# if torch.type(model) == 'nn.DataParallelTable':
-	# 	model = model.get(0)
+	if isinstance(model, nn.DataParallel):
+		model = model.get(0)
 
 	if opt.shareGradInput:
 		pass 

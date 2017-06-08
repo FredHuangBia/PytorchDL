@@ -20,14 +20,14 @@ class opts:
 		parser.add_argument('--www',             default='../../www',    type=str,   help='Path to visualization' )
 	 	# Data options
 		parser.add_argument('--nThreads',        default=4,              type=int,   help='Number of data loading threads' )
-		parser.add_argument('--dataset',         default='EKF2',          type=str,   help='Name of dataset' ,choices=['pku'])
+		parser.add_argument('--dataset',         default='EKF2',         type=str,   help='Name of dataset' ,choices=['pku'])
 		parser.add_argument('--maxImgs',         default=10000,          type=int,   help='Number of images in train+val')
 		parser.add_argument('--trainPctg',       default=0.95,           type=float, help='Percentage of training images')
 	    # Training/testing options
 		parser.add_argument('--nEpochs',         default=50,             type=int,   help='Number of total epochs to run')
 		parser.add_argument('--epochNum',        default=0,              type=int,   help='0=retrain|-1=latest|-2=best', choices=[0,-1,-2])
 		parser.add_argument('--saveEpoch',       default=10,             type=int,   help='saving at least # epochs')
-		parser.add_argument('--batchSize',       default=3,              type=int,   help='mini-batch size')
+		parser.add_argument('--batchSize',       default=16,             type=int,   help='mini-batch size')
 		parser.add_argument('--testOnly',        default=False,          type=bool,  help='Run on validation set only')
 		parser.add_argument('--visEpoch',        default=10,             type=int,   help='Visualizing every n epochs')
 		parser.add_argument('--visTrain',        default=3,              type=int,   help='Visualizing training examples in unit of batchsize')
@@ -37,16 +37,19 @@ class opts:
 	    # Optimization options
 		parser.add_argument('--LR',              default=0.001,          type=float, help='initial learning rate')
 		parser.add_argument('--LRDecay',         default='stepwise',     type=str,   help='LRDecay', choices=['anneal','stepwise','pow','none'])
-		parser.add_argument('--LRDParam',        default=200,            type=float, help='param for learning rate decay')
+		parser.add_argument('--LRDParam',        default=0,              type=float, help='param for learning rate decay')
 		parser.add_argument('--momentum',        default=0.9,            type=float, help='momentum')
 		parser.add_argument('--weightDecay',     default=1e-4,           type=float, help='weight decay')
+		parser.add_argument('--dampening',       default=0,              type=float, help='dampening')
 		parser.add_argument('--dropout',         default=0.5,            type=float, help='zero rate of dropout')
+		parser.add_argument('--optimizer',       default='SGD',          type=str,   help='optimizer type, more choices available', choices=['SGD','Adam'])
 	    # Model options
 		parser.add_argument('--netType',         default='CNN',          type=str,   help='ANN type', choices=['CNN','MCCNN'])
-		parser.add_argument('--netSpec',         default='custom',          type=str,   help='ANN Spec', choices=['custom'])
-		parser.add_argument('--pretrain',        default='none',         type=str,   help='pretrain', choices=['none','default'])
+		parser.add_argument('--netSpec',         default='custom',       type=str,   help='ANN Spec', choices=['custom'])
+		parser.add_argument('--pretrain',        default='none',         type=str,   help='pretrainpytho', choices=['none','default'])
 		parser.add_argument('--absLoss',         default=0,              type=float, help='Weight for abs derender criterion')
 		parser.add_argument('--mseLoss',         default=1,              type=float, help='Weight for mse derender criterion')
+		parser.add_argument('--ceLoss',          default=0,              type=float, help='Weight for cross-entrophy derender criterion')
 		parser.add_argument('--gdlLoss',         default=0,              type=float, help='Weight for gdl derender criterion')
 		parser.add_argument('--customLoss',      default=0,              type=float, help='Weight for custom derender criterion')
 	    # SVM options
@@ -69,34 +72,29 @@ class opts:
 		torch.set_default_tensor_type('torch.FloatTensor')
 		torch.manual_seed(self.args.manualSeed)
 
-		if self.args.dataset == 'example':
-			self.args.numEntry = 10
-			self.args.dataSize = [4]
-			self.args.maxXmlLen = 4 
-		# criterions = importlib.import_module('datasets.'+self.args.dataset+'-criterion')
-		elif self.args.dataset == 'EKF2':
-			self.args.numEntry = 29112
-			self.args.dataSize = [3,21]
+		if self.args.dataset == 'EKF2':
+			self.args.numEntry = 28977
+			self.args.dataSize = [1,3,21]
 			self.args.maxXmlLen = 5
 			# dataset related, for data normalization purpose
 			self.args.lpMin = -1.791070
 			self.args.lpMax = 8.992458
 			self.args.lspMin = -1.892717
-			self.args.lspMax = 5.230966
+			self.args.lspMax = 1.993040
 			self.args.ehMin = -0.067614
-			self.args.ehMax = 0.198532
+			self.args.ehMax = 0.066101
 		# criterions = importlib.import_module('datasets.'+self.args.dataset+'-criterion')
 		elif self.args.dataset == 'EKF4':
-			self.args.numEntry = 28199
-			self.args.dataSize = [3,41]
+			self.args.numEntry = 27977
+			self.args.dataSize = [1,3,41]
 			self.args.maxXmlLen = 5
 			# dataset related, for data normalization purpose
 			self.args.lpMin = -1.791070
 			self.args.lpMax = 8.992458
 			self.args.lspMin = -1.892717
-			self.args.lspMax = 5.230966
+			self.args.lspMax = 1.993040
 			self.args.ehMin = -0.067614
-			self.args.ehMax = 0.198532
+			self.args.ehMax = 0.066101
 		# criterions = importlib.import_module('datasets.'+self.args.dataset+'-criterion')
 
 		if self.args.netType == 'CNN':

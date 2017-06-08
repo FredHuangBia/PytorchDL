@@ -1,5 +1,7 @@
 import os
 import torch
+from torch.nn.parallel.data_parallel import DataParallel
+import torch.nn as nn
 
 def latest(opt):
 	print('=> Loading the latest checkpoint')
@@ -29,16 +31,16 @@ def load(opt):
 		return loaded
 
 def save(epoch, model, criterion, optimState, bestModel, opt):
-	# if torch.type(model) == 'nn.DataParallelTable':
-	# 	model = model.get(0)
+	if isinstance(model, nn.DataParallel):
+		model = model.get(0)
 
 	if bestModel or (epoch % opt.saveEpoch == 0):
 		modelFile = 'model_' + str(epoch) + '.pth'
 		criterionFile = 'criterion_' + str(epoch) + '.pth'
 		optimFile = 'optimState_' + str(epoch) +'.pth'
 		torch.save(model, os.path.join(opt.resume, modelFile))
-		torch.save(criterion, os.path.join(opt.resume, modelFile))
-		torch.save(optimState, os.path.join(opt.resume, modelFile))
+		torch.save(criterion, os.path.join(opt.resume, criterionFile))
+		torch.save(optimState, os.path.join(opt.resume, optimFile))
 		info = {'epoch':epoch, 'modelFile':modelFile, 'criterionFile':criterionFile, 'optimFile':optimFile}
 		torch.save(info, os.path.join(opt.resume, 'latest.pth'))
 

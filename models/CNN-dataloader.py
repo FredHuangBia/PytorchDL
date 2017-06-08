@@ -13,7 +13,7 @@ def create(opt):
 	
 	for split in ['train','val']:
 		dataset = datasets.create(opt, split) # generate the serialized files, then return an instance of the dataset
-		loaders.append(	myDataLoader(dataset=dataset, batch_size=opt.batchSize, shuffle=False, num_workers=opt.nThreads))
+		loaders.append(	myDataLoader(dataset=dataset, batch_size=opt.batchSize, shuffle=True, num_workers=opt.nThreads))
 	# print(loaders[0].__iter__()._next_indices())
 	#TODO !!!!!
 	return loaders[0], loaders[1]

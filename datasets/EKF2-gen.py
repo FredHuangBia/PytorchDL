@@ -4,6 +4,16 @@ import os
 import math
 from tqdm import tqdm
 
+overwrite = False
+
+def normalizeRaw(type, ipt, opt):
+	if type == 0: #lp
+		return (ipt - opt.lpMin) / (opt.lpMax - opt.lpMin)
+	elif type == 1: #lsp
+		return (ipt - opt.lspMin) / (opt.lspMax - opt.lspMin)
+	if type == 2: #eh
+		return (ipt - opt.ehMin) / (opt.ehMax - opt.ehMin)
+
 def findData(opt):
 	maxLength = -1
 	dataPaths = [] #dataPaths is a py list
@@ -15,10 +25,10 @@ def findData(opt):
 
 	for i, line in enumerate([itm for itm in xmlRaw]):
 		pieces = line.split()
-		xml[i][0] = float(pieces[1])
-		xml[i][1] = float(pieces[2])
-		xml[i][2] = float(pieces[3])
-		xml[i][3] = float(pieces[4])
+		xml[i][0] = normalizeRaw(0, float(pieces[1]), opt)
+		xml[i][1] = normalizeRaw(0, float(pieces[2]), opt)
+		xml[i][2] = normalizeRaw(0, float(pieces[3]), opt)
+		xml[i][3] = normalizeRaw(0, float(pieces[4]), opt)
 		xml[i][4] = int(pieces[0])
 		xmlLen[i] = 4
 
@@ -35,16 +45,17 @@ def mergeData(dataPath, opt):
 		path = dataPath[i]
 		mergedName = os.path.join(opt.data, path, 'merged.pth')
 
-		if not os.path.exists(mergedName):
+		if not os.path.exists(mergedName) or overwrite==True:
 			merged = torch.zeros(opt.dataSize)
 			filename = os.path.join(opt.data, path, 'data.raw')
 			dataRaw = open(filename,'r')
 			lines = [line for line in dataRaw] 
 			dataRaw.close()
-			for row in range(opt.dataSize[0]):
-				pieces = lines[row].split()
-				for coln in range(opt.dataSize[1]):
-					merged[row][coln] = float(pieces[coln])
+			for channel in range(opt.dataSize[0]):
+				for row in range(opt.dataSize[1]):
+					pieces = lines[row].split()
+					for coln in range(opt.dataSize[2]):
+						merged[channel][row][coln] = normalizeRaw(row, float(pieces[coln]), opt)
 			torch.save(merged, mergedName)
 
 def exec(opt, cacheFile):

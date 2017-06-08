@@ -29,7 +29,7 @@ class myModel(nn.Module):
 		x = x.view(-1,192)
 		x = F.dropout(x, p=self.dropout)
 		x = self.fc(x)
-		#TODO softmax or sth
+		#TODO sigmoid ?
 		return x
 
 	# def _initialize_weights(self):
@@ -38,7 +38,7 @@ class myModel(nn.Module):
 
 def createModel(opt):
 	model = myModel(opt)
-	ipt = autograd.Variable(torch.randn(16,1,3,21))
-	opt = model.forward(ipt)
-	print(opt)
+	# ipt = autograd.Variable(torch.randn(16,1,3,21))
+	# opt = model.forward(ipt)
+	# print(ipt)
 	return model
