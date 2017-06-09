@@ -105,10 +105,7 @@ class myTrainer():
 			targetXmls.append(targetXml)
 			outputs.append(opt)
 
-		avgAbsDif1 = 0
-		avgAbsDif2 = 0
-		avgAbsDif3 = 0
-		avgAbsDif4 = 0
+		avgAbsDif1, avgAbsDif2, avgAbsDif3, avgAbsDif4 = 0, 0, 0, 0
 		postprocessXml = valLoader.dataset.postprocessXml()
 
 		num = 0
