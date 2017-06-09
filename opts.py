@@ -24,10 +24,11 @@ class opts:
 		parser.add_argument('--maxImgs',         default=10000,          type=int,   help='Number of images in train+val')
 		parser.add_argument('--trainPctg',       default=0.95,           type=float, help='Percentage of training images')
 	    # Training/testing options
-		parser.add_argument('--nEpochs',         default=200,            type=int,   help='Number of total epochs to run')
-		parser.add_argument('--epochNum',        default=-2,              type=int,   help='0=retrain|-1=latest|-2=best', choices=[0,-1,-2])
+		parser.add_argument('--nEpochs',         default=120,            type=int,   help='Number of total epochs to run')
+		parser.add_argument('--epochNum',        default=-2,             type=int,   help='0=retrain|-1=latest|-2=best', choices=[0,-1,-2])
 		parser.add_argument('--saveEpoch',       default=10,             type=int,   help='saving at least # epochs')
 		parser.add_argument('--batchSize',       default=16,             type=int,   help='mini-batch size')
+		parser.add_argument('--valOnly',         default=False,          type=bool,  help='Run on validation set only')
 		parser.add_argument('--testOnly',        default=False,          type=bool,  help='Run on validation set only')
 		parser.add_argument('--visEpoch',        default=10,             type=int,   help='Visualizing every n epochs')
 		parser.add_argument('--visTrain',        default=3,              type=int,   help='Visualizing training examples in unit of batchsize')

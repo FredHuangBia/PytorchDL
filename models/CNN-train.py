@@ -85,13 +85,45 @@ class myTrainer():
 	def visualize(self, targetXmls, outputs, epoch, split, postprocessXml):
 		targetCaps = []
 		outputCaps = []
-		for i in range(len(targetXmls)):
+		for i in range(self.opt.visVal):
 			XmlBatch = postprocessXml(targetXmls[i])
 			OptBatch = postprocessXml(outputs[i])
 			for j in range(self.opt.batchSize):
 				targetCaps.append('target: %.2f %.2f %.2f %.2f' %(XmlBatch[j][0].data[0], XmlBatch[j][1].data[0], XmlBatch[j][2].data[0], XmlBatch[j][3].data[0]))
 				outputCaps.append('output: %.2f %.2f %.2f %.2f' %(OptBatch[j][0].data[0], OptBatch[j][1].data[0], OptBatch[j][2].data[0], OptBatch[j][3].data[0]))
 		vis.writeHTML(targetCaps, outputCaps, epoch, split, self.opt)
+
+	def test(self, valLoader, epoch):
+		self.model.eval()
+		print('\n')
+		print('==> Start test epoch: %d' %epoch)
+		targetXmls = []
+		outputs = []
+		for i, (ipt, targetXml) in enumerate(tqdm(valLoader)):
+			ipt, targetXml = Variable(ipt), Variable(targetXml)
+			opt = self.model.forward(ipt)
+			targetXmls.append(targetXml)
+			outputs.append(opt)
+
+		avgAbsDif1 = 0
+		avgAbsDif2 = 0
+		avgAbsDif3 = 0
+		avgAbsDif4 = 0
+		postprocessXml = valLoader.dataset.postprocessXml()
+
+		num = 0
+		for i in range(len(targetXmls)):
+			XmlBatch = postprocessXml(targetXmls[i])
+			OptBatch = postprocessXml(outputs[i])
+			for j in range(len(XmlBatch)):
+				avgAbsDif1 = (avgAbsDif1 * num + abs(XmlBatch[j][0].data[0] - OptBatch[j][0].data[0]))/(num+1)
+				avgAbsDif2 = (avgAbsDif2 * num + abs(XmlBatch[j][1].data[0] - OptBatch[j][1].data[0]))/(num+1)
+				avgAbsDif3 = (avgAbsDif3 * num + abs(XmlBatch[j][2].data[0] - OptBatch[j][2].data[0]))/(num+1)
+				avgAbsDif4 = (avgAbsDif4 * num + abs(XmlBatch[j][3].data[0] - OptBatch[j][3].data[0]))/(num+1)
+				num += 1
+
+		print('==> Finish test epoch: %d' %epoch)
+		print('Average Abs Diff: \033[1;36m%.3f %.3f %.3f %.3f\033[0m' %(avgAbsDif1, avgAbsDif2, avgAbsDif3, avgAbsDif4))
 
 def createTrainer(model, criterion, opt, optimState):
 	trainer = myTrainer(model, criterion, opt, optimState)

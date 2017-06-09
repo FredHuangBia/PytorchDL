@@ -24,15 +24,19 @@ if __name__=='__main__':
 	print('=> Loading trainer')
 	trainer = Trainer.createTrainer(model, criterion, opt, optimState)
 
-	if opt.testOnly:
-		trainer.val(valLoader, 0)
-		sys.exit()
-
 	bestLoss = math.inf
 	startEpoch = max([1, opt.epochNum])
 	if checkpoint != None:
 		startEpoch = checkpoint['epoch'] + 1
 		bestLoss = checkpoint['loss']
+
+	if opt.valOnly:
+		trainer.val(valLoader, startEpoch-1)
+		sys.exit()
+
+	if opt.testOnly:
+		trainer.test(valLoader, startEpoch-1)
+		sys.exit()
 
 	bestModel = False
 	for epoch in range(startEpoch, opt.nEpochs+1):
