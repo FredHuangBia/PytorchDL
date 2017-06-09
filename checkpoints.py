@@ -30,7 +30,7 @@ def load(opt):
 		loaded = {'epoch':epoch, 'modelFile':modelFile, 'criterionFile':criterionFile, 'optimFile':optimFile}
 		return loaded
 
-def save(epoch, model, criterion, optimState, bestModel, opt):
+def save(epoch, model, criterion, optimState, bestModel, loss, opt):
 	if isinstance(model, nn.DataParallel):
 		model = model.get(0)
 
@@ -41,10 +41,10 @@ def save(epoch, model, criterion, optimState, bestModel, opt):
 		torch.save(model, os.path.join(opt.resume, modelFile))
 		torch.save(criterion, os.path.join(opt.resume, criterionFile))
 		torch.save(optimState, os.path.join(opt.resume, optimFile))
-		info = {'epoch':epoch, 'modelFile':modelFile, 'criterionFile':criterionFile, 'optimFile':optimFile}
+		info = {'epoch':epoch, 'modelFile':modelFile, 'criterionFile':criterionFile, 'optimFile':optimFile, 'loss':loss}
 		torch.save(info, os.path.join(opt.resume, 'latest.pth'))
 
 	if bestModel:
-		info = {'epoch':epoch, 'modelFile':modelFile, 'criterionFile':criterionFile, 'optimFile':optimFile}
+		info = {'epoch':epoch, 'modelFile':modelFile, 'criterionFile':criterionFile, 'optimFile':optimFile, 'loss':loss}
 		torch.save(info, os.path.join(opt.resume, 'best.pth'))
 		torch.save(model, os.path.join(opt.resume, 'model_best.pth'))	

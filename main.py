@@ -1,5 +1,6 @@
 from opts import *
 import sys
+import math
 
 if __name__=='__main__':
 	opt = opts().args
@@ -27,11 +28,12 @@ if __name__=='__main__':
 		trainer.val(valLoader, 0)
 		sys.exit()
 
+	bestLoss = math.inf
 	startEpoch = max([1, opt.epochNum])
 	if checkpoint != None:
-		startEpoch = checkpoint['epoch']
+		startEpoch = checkpoint['epoch'] + 1
+		bestLoss = checkpoint['loss']
 
-	bestLoss = 100
 	bestModel = False
 	for epoch in range(startEpoch, opt.nEpochs+1):
 		trainLoss = trainer.train(trainLoader, epoch)
@@ -39,6 +41,7 @@ if __name__=='__main__':
 
 		if valLoss < bestLoss:
 			bestModel = True
-			print(' * Best model: \033[1;36m%.6f\033[0m' %valLoss)
+			print(' * Best model: \033[1;36m%.6f\033[0m * ' %valLoss)
+			bestLoss = valLoss
 
-		checkpoints.save(epoch, trainer.model, criterion, trainer.optimState, bestModel, opt)
+		checkpoints.save(epoch, trainer.model, criterion, trainer.optimState, bestModel, valLoss ,opt)
