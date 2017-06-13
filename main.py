@@ -38,14 +38,16 @@ if __name__=='__main__':
 		trainer.test(valLoader, startEpoch-1)
 		sys.exit()
 
-	bestModel = False
 	for epoch in range(startEpoch, opt.nEpochs+1):
+		if opt.debug and epoch - startEpoch >=2:
+			break
+		bestModel = False
 		trainLoss = trainer.train(trainLoader, epoch)
 		valLoss = trainer.val(valLoader, epoch)
 
 		if valLoss < bestLoss:
 			bestModel = True
-			print(' * Best model: \033[1;36m%.6f\033[0m * ' %valLoss)
+			print(' * Best model: \033[1;36m%.5f\033[0m * ' %valLoss)
 			bestLoss = valLoss
 
 		checkpoints.save(epoch, trainer.model, criterion, trainer.optimState, bestModel, valLoss ,opt)

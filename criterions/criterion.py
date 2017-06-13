@@ -1,4 +1,4 @@
-# This code may not be necessary, only need this code when customized criterion is necessary
+# This code is imported by default if custom criterion is not necessary
 import torch.nn as nn
 # # Criterion is still a legacy of pytorch
 
@@ -31,7 +31,3 @@ def createCriterion(opt, model):
 		criterion = customLoss()
 
 	return criterion
-
-# class customCriterion(Criterion):
-# 	def __init__():
-# 		nn.Criterion.__init__(self)

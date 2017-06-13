@@ -8,11 +8,11 @@ overwrite = False
 
 def normalizeRaw(type, ipt, opt):
 	if type == 0: #lp
-		return (ipt - opt.lpMin) / (opt.lpMax - opt.lpMin)
+		return (ipt - (opt.lpMax + opt.lpMin)/2 ) / (opt.lpMax - opt.lpMin) * 2
 	elif type == 1: #lsp
-		return (ipt - opt.lspMin) / (opt.lspMax - opt.lspMin)
+		return (ipt - (opt.lspMax + opt.lspMin)/2 ) / (opt.lspMax - opt.lspMin) * 2
 	if type == 2: #eh
-		return (ipt - opt.ehMin) / (opt.ehMax - opt.ehMin)
+		return (ipt - (opt.ehMax + opt.ehMin)/2 ) / (opt.ehMax - opt.ehMin) * 2
 
 def findData(opt):
 	maxLength = -1

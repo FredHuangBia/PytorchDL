@@ -4,7 +4,10 @@ import os
 
 def setup(opt, checkpoint, model):
 	criterion = None
-	criterionHandler = importlib.import_module('models.' + opt.netType + '-criterion')
+	if opt.customLoss == 0:
+		criterionHandler = importlib.import_module('criterions.criterion')
+	else:
+		criterionHandler = importlib.import_module('models.' + opt.netType + '-criterion')
 
 	if checkpoint != None:
 		criterionPath = os.path.join(opt.resume, checkpoint['criterionFile'])

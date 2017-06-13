@@ -17,7 +17,7 @@ class myDataset(Dataset):
 		path = self.dataInfo['dataPath'][index]
 		data = torch.load(os.path.join(self.dir, path, 'merged.pth'))
 		xml = self.dataInfo['xml'][index]
-		xmlLen = self.dataInfo['xmlLen'][index] # may not be always useful
+		xmlLen = self.dataInfo['xmlLen'][index] # may not be useful
 		return self.preprocessData(data), self.preprocessXml(xml)
 
 	def __len__(self):
@@ -25,7 +25,7 @@ class myDataset(Dataset):
 
 	def preprocessData(self, ipt):
 		if self.split == 'train':
-			processed = t.addNoise(ipt, 0, 0.01)
+			processed = t.addNoise(ipt, 0, 0.001)
 			return processed
 		elif self.split == 'val':
 			processed = ipt
@@ -47,7 +47,7 @@ class myDataset(Dataset):
 
 	def postprocessXml(self):
 		def process(ipt):
-			processed = ipt * (self.opt.lpMax - self.opt.lpMin) + self.opt.lpMin
+			processed = ipt / 2 * (self.opt.lpMax - self.opt.lpMin) + (self.opt.lpMax + self.opt.lpMin)/2
 			return processed
 		return process
 

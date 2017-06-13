@@ -8,7 +8,7 @@ class opts:
 	def parse(self):
 		parser = argparse.ArgumentParser()
 		# General options
-		parser.add_argument('--debug',           default=False,          type=bool,  help='Debug mode' )
+		parser.add_argument('--debug',           default=False,          type=bool,  help='Debug mode, only run 2 epochs' )
 		parser.add_argument('--manualSeed',      default=0,              type=int,   help='manual seed')
 		parser.add_argument('--GPUs',            default='0',            type=str,   help='ID of GPUs to use, seeperate by ,')
 		parser.add_argument('--backend',         default='cudnn',        type=str,   help='cudnn|cunn', choices=['cudnn', 'cunn'])
@@ -21,15 +21,16 @@ class opts:
 	 	# Data options
 		parser.add_argument('--nThreads',        default=4,              type=int,   help='Number of data loading threads' )
 		parser.add_argument('--dataset',         default='EKF2',         type=str,   help='Name of dataset' ,choices=['pku'])
-		parser.add_argument('--maxImgs',         default=10000,          type=int,   help='Number of images in train+val')
+		parser.add_argument('--maxImgs',         default=100000,         type=int,   help='Number of images in train+val')
 		parser.add_argument('--trainPctg',       default=0.95,           type=float, help='Percentage of training images')
 	    # Training/testing options
 		parser.add_argument('--nEpochs',         default=120,            type=int,   help='Number of total epochs to run')
-		parser.add_argument('--epochNum',        default=-2,             type=int,   help='0=retrain|-1=latest|-2=best', choices=[0,-1,-2])
+		parser.add_argument('--epochNum',        default=0,             type=int,   help='0=retrain|-1=latest|-2=best', choices=[0,-1,-2])
 		parser.add_argument('--saveEpoch',       default=10,             type=int,   help='saving at least # epochs')
 		parser.add_argument('--batchSize',       default=16,             type=int,   help='mini-batch size')
+		parser.add_argument('--dropout',         default=0.5,            type=float, help='zero rate of dropout')
 		parser.add_argument('--valOnly',         default=False,          type=bool,  help='Run on validation set only')
-		parser.add_argument('--testOnly',        default=False,          type=bool,  help='Run on validation set only')
+		parser.add_argument('--testOnly',        default=False,          type=bool,  help='Run the test to see the performance')
 		parser.add_argument('--visEpoch',        default=10,             type=int,   help='Visualizing every n epochs')
 		parser.add_argument('--visTrain',        default=3,              type=int,   help='Visualizing training examples in unit of batchsize')
 		parser.add_argument('--visVal',          default=3,              type=int,   help='Visualizing validation examples in unit of batchsize')
@@ -42,13 +43,12 @@ class opts:
 		parser.add_argument('--momentum',        default=0.9,            type=float, help='momentum')
 		parser.add_argument('--weightDecay',     default=1e-4,           type=float, help='weight decay')
 		parser.add_argument('--dampening',       default=0,              type=float, help='dampening')
-		parser.add_argument('--dropout',         default=0.5,            type=float, help='zero rate of dropout')
 		parser.add_argument('--optimizer',       default='SGD',          type=str,   help='optimizer type, more choices available', choices=['SGD','Adam'])
 	    # Model options
 		parser.add_argument('--netType',         default='CNN',          type=str,   help='ANN type', choices=['CNN','MCCNN'])
 		parser.add_argument('--netSpec',         default='custom',       type=str,   help='ANN Spec', choices=['custom'])
-		parser.add_argument('--pretrain',        default='none',         type=str,   help='pretrainpytho', choices=['none','default'])
-		parser.add_argument('--absLoss',         default=0,              type=float, help='Weight for abs derender criterion')
+		parser.add_argument('--pretrain',        default='none',         type=str,   help='pretrain', choices=['none','default'])
+		parser.add_argument('--L1Loss',          default=0,              type=float, help='Weight for abs derender criterion')
 		parser.add_argument('--mseLoss',         default=1,              type=float, help='Weight for mse derender criterion')
 		parser.add_argument('--ceLoss',          default=0,              type=float, help='Weight for cross-entrophy derender criterion')
 		parser.add_argument('--gdlLoss',         default=0,              type=float, help='Weight for gdl derender criterion')
@@ -73,37 +73,37 @@ class opts:
 		torch.set_default_tensor_type('torch.FloatTensor')
 		torch.manual_seed(self.args.manualSeed)
 
+		# Customized parameters for each dataset and net
 		if self.args.dataset == 'EKF2':
-			self.args.numEntry = 28977
+			self.args.numEntry = 28779
 			self.args.dataSize = [1,3,21]
 			self.args.maxXmlLen = 5
-			# dataset related, for data normalization purpose
 			self.args.lpMin = -1.791070
-			self.args.lpMax = 8.992458
+			self.args.lpMax = 8.823801
 			self.args.lspMin = -1.892717
-			self.args.lspMax = 1.993040
+			self.args.lspMax = 1.976027
 			self.args.ehMin = -0.067614
-			self.args.ehMax = 0.066101
-		# criterions = importlib.import_module('datasets.'+self.args.dataset+'-criterion')
+			self.args.ehMax = 0.064971
+
 		elif self.args.dataset == 'EKF4':
 			self.args.numEntry = 27977
 			self.args.dataSize = [1,3,41]
 			self.args.maxXmlLen = 5
-			# dataset related, for data normalization purpose
 			self.args.lpMin = -1.791070
-			self.args.lpMax = 8.992458
+			self.args.lpMax = 8.823801
 			self.args.lspMin = -1.892717
-			self.args.lspMax = 1.993040
+			self.args.lspMax = 1.976027
 			self.args.ehMin = -0.067614
-			self.args.ehMax = 0.066101
-		# criterions = importlib.import_module('datasets.'+self.args.dataset+'-criterion')
+			self.args.ehMax = 0.064971
 
 		if self.args.netType == 'CNN':
+			self.args.outputSize = 4
+
+		elif self.args.netType == 'MCCNN':
 			self.args.outputSize = 4
 		
 		if self.args.netType == 'cnnSVM':
 			opt.nEpochs = 1
-
 
 		self.args.visPerInst = 4
 		if self.args.visWidth == -1:
@@ -117,7 +117,7 @@ class opts:
 			assert self.args.nClasses != 0 , 'nClasses required when resetClassifier is set'
 
 		self.args.hashKey = self.args.dataset+'_'+self.args.netType+'_'+self.args.netSpec+'_'+'pretrain='+self.args.pretrain+'_'+ \
-			'Loss='+str(self.args.absLoss)+'-'+str(self.args.mseLoss)+'-'+str(self.args.gdlLoss)+'-'+str(self.args.customLoss)+'_'+\
+			'Loss='+str(self.args.L1Loss)+'-'+str(self.args.mseLoss)+'-'+str(self.args.gdlLoss)+'-'+str(self.args.customLoss)+'_'+\
 			'LR='+str(self.args.LR)+'_'+'Suffix='+self.args.suffix
 
 		self.args.dataRoot = self.args.data
