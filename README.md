@@ -26,15 +26,15 @@ $ pip3 install tqdm
 $ pip3 install numpy
 ```
 
-Then, after cloning this repo, create a directory structure like this: **YourProjectName/code/PytorchDL/** where PytorchDL shuold be the repo.
+After cloning this repo, create a directory structure like this: **YourProjectName/code/PytorchDL/** where PytorchDL shuold be the repo.
 
-Then, go to the **'sup'** folder and run the **sliceData.py** to prepare the dataset. This will create a **'data'** folder parallel to the **'code'** folder inside **'YourProjectName'** which stores the training data.
+Next, go to the **'sup'** folder and run the **sliceData.py** to prepare the dataset. This will create a **'data'** folder parallel to the **'code'** folder inside **'YourProjectName'** which stores the training data.
 ```sh
 $ cd YourProjectName/code/PytorchDL/sup
 $ python3 sliceData.py
 ```
 
-Then you are done! Run the **main.py** to start training your neural network!
+Now you are done! Run the **main.py** to start training your neural network!
 ```sh
 $ cd ../
 $ python3 main.py
