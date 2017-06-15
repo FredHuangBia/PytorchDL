@@ -1,3 +1,5 @@
+"Always run this code"
+
 from opts import *
 import sys
 import math
@@ -29,6 +31,7 @@ if __name__=='__main__':
 	if checkpoint != None:
 		startEpoch = checkpoint['epoch'] + 1
 		bestLoss = checkpoint['loss']
+		print('Previous best loss: \033[1;36m%.5f\033[0m' %bestLoss)
 
 	if opt.valOnly:
 		trainer.val(valLoader, startEpoch-1)

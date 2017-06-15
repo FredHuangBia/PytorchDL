@@ -13,9 +13,11 @@ class myModel(nn.Module):
 		self.bn2 = nn.BatchNorm2d(64)
 		self.conv3 = nn.Conv2d(in_channels=64, out_channels=128, kernel_size=(1,3), stride=(1,1), padding=(0,1))
 		self.bn3 = nn.BatchNorm2d(128)
-		self.conv4 = nn.Conv2d(in_channels=128, out_channels=128, kernel_size=(1,3), stride=(1,1), padding=(0,1))
-		self.bn4 = nn.BatchNorm2d(128)
-		self.fc1 = nn.Linear(384, 4)
+		self.conv4 = nn.Conv2d(in_channels=128, out_channels=256, kernel_size=(1,3), stride=(1,1), padding=(0,1))
+		self.bn4 = nn.BatchNorm2d(256)
+		self.conv5 = nn.Conv2d(in_channels=256, out_channels=256, kernel_size=(1,3), stride=(1,1), padding=(0,1))
+		self.bn5 = nn.BatchNorm2d(256)
+		self.fc1 = nn.Linear(384*2, 4)
 		self.dropout = opt.dropout
 
 	def forward(self, x):
@@ -25,21 +27,24 @@ class myModel(nn.Module):
 
 		x = self.conv2(x)
 		x = self.bn2(x)
-		x = F.max_pool2d(x, kernel_size=(1,2), stride=(1,2), padding=(0,1))
+		x = F.avg_pool2d(x, kernel_size=(1,2), stride=(1,2), padding=(0,1))
 		x = F.relu(x)
 
 		x = self.conv3(x)
 		x = self.bn3(x)
-		x = F.max_pool2d(x, kernel_size=(1,2), stride=(1,2), padding=(0,1))
+		x = F.avg_pool2d(x, kernel_size=(1,2), stride=(1,2), padding=(0,1))
 		x = F.relu(x)
 
 		x = self.conv4(x)
 		x = self.bn4(x)
 		x = F.relu(x)
+
+		x = self.conv5(x)
+		x = self.bn5(x)
 		x = F.avg_pool2d(x, kernel_size=(1,2), stride=(1,2), padding=0)
 		x = F.relu(x)
 
-		x = x.view(-1,384)
+		x = x.view(-1,384*2)
 		x = F.dropout(x, p=self.dropout)
 		x = self.fc1(x)
 

@@ -17,6 +17,10 @@ class myDataset(Dataset):
 		path = self.dataInfo['dataPath'][index]
 		data = torch.load(os.path.join(self.dir, path, 'merged.pth'))
 		xml = self.dataInfo['xml'][index]
+		startLp = data[0][0][0]
+		for i in range(21):
+			data[0][0][i] -= startLp
+		xml -= startLp
 		xmlLen = self.dataInfo['xmlLen'][index] # may not be useful
 		return self.preprocessData(data), self.preprocessXml(xml)
 

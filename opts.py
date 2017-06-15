@@ -25,7 +25,7 @@ class opts:
 		parser.add_argument('--trainPctg',       default=0.95,           type=float, help='Percentage of training images')
 	    # Training/testing options
 		parser.add_argument('--nEpochs',         default=120,            type=int,   help='Number of total epochs to run')
-		parser.add_argument('--epochNum',        default=0,             type=int,   help='0=retrain|-1=latest|-2=best', choices=[0,-1,-2])
+		parser.add_argument('--epochNum',        default=0,              type=int,   help='0=retrain|-1=latest|-2=best', choices=[0,-1,-2])
 		parser.add_argument('--saveEpoch',       default=10,             type=int,   help='saving at least # epochs')
 		parser.add_argument('--batchSize',       default=16,             type=int,   help='mini-batch size')
 		parser.add_argument('--dropout',         default=0.5,            type=float, help='zero rate of dropout')
@@ -45,11 +45,11 @@ class opts:
 		parser.add_argument('--dampening',       default=0,              type=float, help='dampening')
 		parser.add_argument('--optimizer',       default='SGD',          type=str,   help='optimizer type, more choices available', choices=['SGD','Adam'])
 	    # Model options
-		parser.add_argument('--netType',         default='CNN',          type=str,   help='ANN type', choices=['CNN','MCCNN'])
+		parser.add_argument('--netType',         default='CNN5',          type=str,   help='ANN type', choices=['CNN5','MCCNN'])
 		parser.add_argument('--netSpec',         default='custom',       type=str,   help='ANN Spec', choices=['custom'])
 		parser.add_argument('--pretrain',        default='none',         type=str,   help='pretrain', choices=['none','default'])
-		parser.add_argument('--L1Loss',          default=0,              type=float, help='Weight for abs derender criterion')
-		parser.add_argument('--mseLoss',         default=1,              type=float, help='Weight for mse derender criterion')
+		parser.add_argument('--L1Loss',          default=1,              type=float, help='Weight for abs derender criterion')
+		parser.add_argument('--mseLoss',         default=0,              type=float, help='Weight for mse derender criterion')
 		parser.add_argument('--ceLoss',          default=0,              type=float, help='Weight for cross-entrophy derender criterion')
 		parser.add_argument('--gdlLoss',         default=0,              type=float, help='Weight for gdl derender criterion')
 		parser.add_argument('--customLoss',      default=0,              type=float, help='Weight for custom derender criterion')
@@ -96,7 +96,7 @@ class opts:
 			self.args.ehMin = -0.067614
 			self.args.ehMax = 0.064971
 
-		if self.args.netType == 'CNN':
+		if self.args.netType == 'CNN5':
 			self.args.outputSize = 4
 
 		elif self.args.netType == 'MCCNN':

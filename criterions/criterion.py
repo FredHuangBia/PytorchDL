@@ -1,6 +1,6 @@
-# This code is imported by default if custom criterion is not necessary
+"This code is imported by default if custom criterion is not necessary."
+
 import torch.nn as nn
-# # Criterion is still a legacy of pytorch
 
 def initCriterion(criterion, model):
 	# if isinstance(criterion, nn.MultiCriterion) or isinstance(criterion, nn.ParallelCriterion):
@@ -9,6 +9,7 @@ def initCriterion(criterion, model):
 	pass
 
 def createCriterion(opt, model):
+	"Criterion is still a legacy of pytorch."
 	# criterion = nn.MultiCriterion()
 	# if opt.absLoss != 0:
 	# 	criterion.add(nn.AbsCriterion(), weight=opt.absLoss)
