@@ -1,5 +1,6 @@
 import os
 import math
+import numpy as np
 
 def renderTable(targetCaps, outputCaps, ncoln):
 	assert len(targetCaps) == len(outputCaps), 'Target and output Caps dimension mismatch.'

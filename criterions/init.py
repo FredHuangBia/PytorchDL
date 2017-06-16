@@ -4,10 +4,11 @@ import os
 
 def setup(opt, checkpoint, model):
 	criterion = None
-	if opt.customLoss == 0:
-		criterionHandler = importlib.import_module('criterions.criterion')
-	else:
+
+	try: #if customized criterion is defined, overwrite the default one
 		criterionHandler = importlib.import_module('models.' + opt.netType + '-criterion')
+	except ImportError:
+		criterionHandler = importlib.import_module('criterions.criterion')
 
 	if checkpoint != None:
 		criterionPath = os.path.join(opt.resume, checkpoint['criterionFile'])

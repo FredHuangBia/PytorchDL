@@ -1,5 +1,3 @@
-"Always run this code"
-
 from opts import *
 import sys
 import math
@@ -8,10 +6,13 @@ if __name__=='__main__':
 	opt = opts().args
 
 	models = importlib.import_module('models.init')
-	DataLoader = importlib.import_module('models.' + opt.netType + '-dataloader')
-	checkpoints = importlib.import_module('checkpoints')
+	checkpoints = importlib.import_module('utils.checkpoints')
 	criterions = importlib.import_module('criterions.init')
 	Trainer = importlib.import_module('models.' + opt.netType + '-train')
+	try: #if customized dataloader is defined, overwrite the default one
+		DataLoader = importlib.import_module('models.' + opt.netType + '-dataloader')
+	except ImportError:
+		DataLoader = importlib.import_module('datasets.dataloader')
 
 	print('=> Setting up data loader')
 	trainLoader, valLoader = DataLoader.create(opt)

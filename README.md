@@ -5,16 +5,15 @@ PytorchDL is a general deep learning code using pytorch. The code can be easy mo
 # Code Structure
 
 There are 5 main subfolders in this repo: 
-  - models: Define your neural network model sturcture, trainnner, and dataloader
+  - models: Define your neural network model sturcture, trainnner, dataloader(optional) and criterion(optional)
   - datasets: Define and preparse datasets
-  - criterions: Define the loss function
-  - utils: Data augmentation functions, visualization functions
+  - criterions: Define the default loss function
+  - utils: Data augmentation functions, visualization functions, resume and save functions
   - sup: An example dataset which can be used to run and test the code
 
-And 3 other python scripts:
+And 2 other python scripts:
   - main.py: The code to run
   - opts.py: Define general training and essential dataset and model parameters
-  - checkpoints.py: Resume or save training
 
 # Run the example
 First you need to make sure the python version is **python 3.5**
@@ -25,6 +24,8 @@ $ pip3 install torchvision
 $ pip3 install tqdm
 $ pip3 install numpy
 ```
+
+If any of the above failed during installation, please try again with 'sudo'.
 
 After cloning this repo, create a directory structure like this: **YourProjectName/code/PytorchDL/** where PytorchDL shuold be the repo.
 
