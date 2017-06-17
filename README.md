@@ -47,7 +47,3 @@ You will notice that this code will create a series of folders in parallel with 
   - www: Aseries of html files, for visualization purpose
  
 Also, at the begining the code will take some time to serialize all the training data and store them as '.pth' in the 'data' folder. Just be a little bit patient and by doing so, we'll be able to load the data faster while training!
-
-# Contact
-
-Any question, please email huangzhj@shanghaitech.edu.cn or zhengjia@mit.edu
