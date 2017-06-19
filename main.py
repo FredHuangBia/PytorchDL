@@ -15,7 +15,7 @@ if __name__=='__main__':
 		DataLoader = importlib.import_module('datasets.dataloader')
 
 	print('=> Setting up data loader')
-	trainLoader, valLoader = DataLoader.create(opt)
+	trainLoader, valLoader, testLoader = DataLoader.create(opt)
 
 	print('=> Checking checkpoints')
 	checkpoint = checkpoints.load(opt)
@@ -39,9 +39,12 @@ if __name__=='__main__':
 		sys.exit()
 
 	if opt.testOnly:
-		trainer.test(valLoader, startEpoch-1)
+		trainer.test(testLoader, startEpoch-1)
 		sys.exit()
 
+	if opt.GPU:
+		torch.cuda.set_device(int(opt.GPUs[0]))
+		
 	for epoch in range(startEpoch, opt.nEpochs+1):
 		if opt.debug and epoch - startEpoch >=2:
 			break

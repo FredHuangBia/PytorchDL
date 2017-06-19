@@ -41,6 +41,9 @@ class myTrainer():
 		avgLoss = 0
 		for i, (ipt, targetXml) in enumerate(tqdm(trainLoader)):
 			ipt, targetXml = Variable(ipt), Variable(targetXml)
+			if self.opt.GPU:
+				ipt = ipt.cuda()
+				targetXml = targetXml.cuda()
 			self.optimizer.zero_grad()
 			opt = self.model.forward(ipt)
 			loss = self.criterion(opt, targetXml)
@@ -70,6 +73,9 @@ class myTrainer():
 		avgLoss = 0
 		for i, (ipt, targetXml) in enumerate(tqdm(valLoader)):
 			ipt, targetXml = Variable(ipt), Variable(targetXml)
+			if self.opt.GPU:
+				ipt = ipt.cuda()
+				targetXml = targetXml.cuda()
 			opt = self.model.forward(ipt)
 			loss = self.criterion(opt, targetXml)
 			avgLoss = (avgLoss * i + loss.data[0]) / (i + 1)
@@ -104,6 +110,9 @@ class myTrainer():
 		outputs = []
 		for i, (ipt, targetXml) in enumerate(tqdm(valLoader)):
 			ipt, targetXml = Variable(ipt), Variable(targetXml)
+			if self.opt.GPU:
+				ipt = ipt.cuda()
+				targetXml = targetXml.cuda()
 			opt = self.model.forward(ipt)
 			targetXmls.append(targetXml)
 			outputs.append(opt)

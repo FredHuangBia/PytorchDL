@@ -13,8 +13,8 @@ class myDataLoader(DataLoader):
 def create(opt):
 	loaders = []
 	
-	for split in ['train','val']:
+	for split in ['train', 'val', 'test']:
 		dataset = datasets.create(opt, split) # generate the serialized files, then return an instance of the dataset
 		loaders.append(	myDataLoader(dataset=dataset, batch_size=opt.batchSize, shuffle=True, num_workers=opt.nThreads))
 	# print(loaders[0].__iter__()._next_indices())
-	return loaders[0], loaders[1]
+	return loaders[0], loaders[1], loaders[2]

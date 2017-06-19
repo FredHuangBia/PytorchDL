@@ -2,6 +2,7 @@ import os
 import torch
 from torch.nn.parallel.data_parallel import DataParallel
 import torch.nn as nn
+import subprocess
 
 def latest(opt):
 	print('=> Loading the latest checkpoint')
@@ -35,6 +36,9 @@ def save(epoch, model, criterion, optimState, bestModel, loss, opt):
 		model = model.get(0)
 
 	if bestModel or (epoch % opt.saveEpoch == 0):
+		if opt.saveOne:
+			subprocess.call('rm ' + opt.resume + '/*', shell=True)
+			
 		modelFile = 'model_' + str(epoch) + '.pth'
 		criterionFile = 'criterion_' + str(epoch) + '.pth'
 		optimFile = 'optimState_' + str(epoch) +'.pth'

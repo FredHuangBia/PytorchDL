@@ -75,4 +75,6 @@ class myModel(nn.Module):
 
 def createModel(opt):
 	model = myModel(opt)
+	if opt.GPU:
+		model = model.cuda()
 	return model

@@ -28,7 +28,5 @@ def createCriterion(opt, model):
 		criterion = nn.CrossEntropyLoss()
 	elif opt.gdlLoss != 0:
 		criterion = nn.GDLLoss()
-	elif opt.customLoss != 0:
-		criterion = customLoss()
 
 	return criterion

@@ -59,7 +59,7 @@ def mergeData(dataPath, opt):
 			torch.save(merged, mergedName)
 
 def exec(opt, cacheFile):
-	print("=> Generating list of audios")
+	print("=> Generating list of data")
 	dataPath, xml, xmlLen = findData(opt)
 	mergeData(dataPath, opt)
 
