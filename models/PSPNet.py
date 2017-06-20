@@ -6,7 +6,7 @@ import torch.nn.functional as F
 from torchvision import models
 
 class PSPDec(nn.Module):
-	def __init__(self, in_features, out_features, downsize, upsize=(128,256)):
+	def __init__(self, in_features, out_features, downsize, upsize):
 		super().__init__()
 
 		self.features = nn.Sequential(
@@ -23,21 +23,6 @@ class PSPDec(nn.Module):
 class myModel(nn.Module):
 	def __init__(self, opt):
 		super().__init__()
-
-		'''
-		self.conv1 = nn.Sequential(
-			nn.Conv2d(3, 64, 3, stride=2, padding=1, bias=False),
-			nn.BatchNorm2d(64, momentum=.95),
-			nn.ReLU(inplace=True),
-			nn.Conv2d(64, 64, 3, stride=1, padding=1, bias=False),
-			nn.BatchNorm2d(64, momentum=.95),
-			nn.ReLU(inplace=True),
-			nn.Conv2d(64, 128, 3, stride=1, padding=1, bias=False),
-			nn.BatchNorm2d(128, momentum=.95),
-			nn.ReLU(inplace=True),
-			nn.MaxPool2d(3, stride=2, padding=1),
-		)
-		'''
 
 		if opt.netSpec == 'resnet101':
 			resnet = models.resnet101(pretrained=opt.pretrain)
@@ -57,11 +42,15 @@ class myModel(nn.Module):
 			if isinstance(m, nn.BatchNorm2d):
 				m.requires_grad = False
 
-		self.layer5a = PSPDec(512, 128, (128,256))
-		self.layer5b = PSPDec(512, 128, (64,128))
-		self.layer5c = PSPDec(512, 128, (32,64))
-		self.layer5d = PSPDec(512, 128, (16,32))
-		self.layer5e = PSPDec(512, 128, (1,1))
+		height = int(opt.cropedSize[0]*opt.downRate)
+		width = int(opt.cropedSize[1]*opt.downRate)
+		hw = (height, width)
+
+		self.layer5a = PSPDec(512, 128, (int(hw[0]/1),  int(hw[1]/1)), hw)
+		self.layer5b = PSPDec(512, 128, (int(hw[0]/4),  int(hw[1]/8)), hw)
+		self.layer5c = PSPDec(512, 128, (int(hw[0]/16), int(hw[1]/32)), hw)
+		self.layer5d = PSPDec(512, 128, (int(hw[0]/64), int(hw[1]/128)), hw)
+		self.layer5e = PSPDec(512, 128, (1, 1), hw)
 
 		self.final = nn.Sequential(
 			nn.Conv2d(128*5, 128, 3, padding=1, bias=False),
@@ -88,7 +77,7 @@ class myModel(nn.Module):
 			self.layer5b(x),
 			self.layer5c(x),
 			self.layer5d(x),
-			self.layer5e(x)
+			self.layer5e(x),
 		], 1)
 		# print('cated', x.size())
 		final = self.final(x)

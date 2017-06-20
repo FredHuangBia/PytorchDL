@@ -21,7 +21,7 @@ class myDataset(Dataset):
 		dataPath = self.dataInfo['dataPath'][index]
 		# data = torch.load(dataPath)
 		dataRaw = misc.imread(dataPath)
-		dataRaw = misc.imresize(dataRaw, 0.125)
+		dataRaw = misc.imresize(dataRaw, self.opt.downRate)
 		npRaw = np.asarray(dataRaw, dtype=np.float32)
 		npRaw = np.swapaxes(npRaw, 0, 2)
 		npRaw = np.swapaxes(npRaw, 1, 2)

@@ -24,7 +24,7 @@ class myTrainer():
 		if opt.optimizer == 'SGD':
 			self.optimizer = optim.SGD(model.parameters(), lr=opt.LR, momentum=opt.momentum, dampening=opt.dampening, weight_decay=opt.weightDecay)
 		elif opt.optimizer == 'Adam':
-			self.optimizer = optim.Adam(model.parameters(), lr=opt.LR, betas=(opt.momentum,0.999), eps=1e-8, weight_decay=opt.weightDecay)
+			self.optimizer = optim.Adam(model.parameters(), lr=opt.LR, betas=(opt.momentum, 0.999), eps=1e-8, weight_decay=opt.weightDecay)
 
 		self.logger = { 'train' : open(os.path.join(opt.resume, 'train.log'), 'a+'), 
 						'val' : open(os.path.join(opt.resume, 'val.log'), 'a+')
@@ -72,6 +72,8 @@ class myTrainer():
 		outputs = []
 		avgLoss = 0
 		for i, (ipt, targetXml) in enumerate(tqdm(valLoader)):
+			if i == 100:
+				break
 			ipt, targetXml = Variable(ipt), Variable(targetXml)
 			if self.opt.GPU:
 				ipt = ipt.cuda()

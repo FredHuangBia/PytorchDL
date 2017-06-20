@@ -14,6 +14,13 @@ if __name__=='__main__':
 	except ImportError:
 		DataLoader = importlib.import_module('datasets.dataloader')
 
+	if opt.GPU:
+		torch.cuda.set_device(int(opt.GPUs[0]))
+		if opt.backend == 'cudnn':
+			torch.backends.cudnn.enabled = True
+		elif opt.backend == 'cunn':
+			torch.backends.cudnn.enabled = False
+
 	print('=> Setting up data loader')
 	trainLoader, valLoader, testLoader = DataLoader.create(opt)
 
@@ -41,9 +48,6 @@ if __name__=='__main__':
 	if opt.testOnly:
 		trainer.test(testLoader, startEpoch-1)
 		sys.exit()
-
-	if opt.GPU:
-		torch.cuda.set_device(int(opt.GPUs[0]))
 		
 	for epoch in range(startEpoch, opt.nEpochs+1):
 		if opt.debug and epoch - startEpoch >=2:

@@ -20,10 +20,6 @@ def setup(opt, checkpoint, valLoader):
 	if isinstance(model, nn.DataParallel):
 		model = model.get(0)
 
-	if opt.shareGradInput:
-		pass 
-		#TODO
-
 	if opt.resetClassifier and not checkpoint:
 		pass
 		#TODO
