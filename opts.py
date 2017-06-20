@@ -29,7 +29,7 @@ class opts:
 		parser.add_argument('--epochNum',        default=0,              type=int,   help='0=retrain|-1=latest|-2=best', choices=[0,-1,-2])
 		parser.add_argument('--saveEpoch',       default=10,             type=int,   help='saving at least # epochs')
 		parser.add_argument('--saveOne',         default=True,           type=bool,  help='Only preserve one saved model')
-		parser.add_argument('--batchSize',       default=1,              type=int,   help='mini-batch size')
+		parser.add_argument('--batchSize',       default=2,              type=int,   help='mini-batch size')
 		parser.add_argument('--dropout',         default=0.5,            type=float, help='zero rate of dropout')
 		parser.add_argument('--valOnly',         default=False,          type=bool,  help='Run on validation set only')
 		parser.add_argument('--testOnly',        default=False,          type=bool,  help='Run the test to see the performance')
@@ -46,7 +46,7 @@ class opts:
 		parser.add_argument('--dampening',       default=0,              type=float, help='dampening')
 		parser.add_argument('--optimizer',       default='Adam',         type=str,   help='optimizer type, more choices available', choices=['SGD','Adam'])
 	    # Model options
-		parser.add_argument('--netType',         default='PSPNet',       type=str,   help='Your defined model name', choices=['CNN5','MCCNN','PSPNet'])
+		parser.add_argument('--netType',         default='ENet',         type=str,   help='Your defined model name', choices=['CNN5','MCCNN','PSPNet','ENet'])
 		parser.add_argument('--netSpec',         default='resnet34',     type=str,   help='Other model to be loaded', choices=['custom','resnet101','resnet34'])
 		parser.add_argument('--pretrain',        default=True,           type=bool,  help='Pretrained or not')
 		parser.add_argument('--L1Loss',          default=0,              type=float, help='Weight for abs derender criterion')
@@ -80,6 +80,8 @@ class opts:
 			self.args.lspMax = 1.976027
 			self.args.ehMin = -0.067614
 			self.args.ehMax = 0.064971
+		elif self.args.dataset == 'CityScapesF':
+			self.args.downRate = 1.0
 
 		if self.args.netType == 'CNN5':
 			self.args.outputSize = 4
@@ -88,7 +90,6 @@ class opts:
 			self.args.outputSize = 4
 
 		elif self.args.netType == 'PSPNet':
-			self.args.downRate = 0.25
 			self.args.cropedSize = (1024, 2048)
 			self.args.branchOut = 128
 

@@ -70,10 +70,10 @@ def exec(opt, cacheFile):
 			trainXmlPath.append(xmlPaths[i])
 		elif split == 'val':
 			valDataPath.append(dataPaths[i])
-			valXmlPath.append(dataPaths[i])
+			valXmlPath.append(xmlPaths[i])
 		elif split == 'test':
 			testDataPath.append(dataPaths[i])
-			testXmlPath.append(dataPaths[i])
+			testXmlPath.append(xmlPaths[i])
 		else:
 			print('Unknown data split!!!')	
 

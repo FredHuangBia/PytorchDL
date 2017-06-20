@@ -20,4 +20,7 @@ def setup(opt, checkpoint, model):
 		print('=> Creating new criterion')
 		criterion = criterionHandler.createCriterion(opt, model)
 
+	if opt.GPU:
+		criterion = criterion.cuda()
+
 	return criterion

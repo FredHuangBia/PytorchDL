@@ -5,7 +5,7 @@ import os
 import importlib
 from torch.nn.parallel.data_parallel import DataParallel
 
-def setup(opt, checkpoint, valLoader):
+def setup(opt, checkpoint):
 	model = None
 	if checkpoint != None:
 		modelPath = os.path.join(opt.resume, checkpoint['modelFile'])

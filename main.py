@@ -28,7 +28,7 @@ if __name__=='__main__':
 	checkpoint = checkpoints.load(opt)
 
 	print('=> Setting up model and criterion')
-	model, optimState = models.setup(opt, checkpoint, valLoader)
+	model, optimState = models.setup(opt, checkpoint)
 	criterion = criterions.setup(opt, checkpoint, model)
 
 	print('=> Loading trainer')
