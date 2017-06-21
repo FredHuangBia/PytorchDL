@@ -21,7 +21,7 @@ ENCODER_PARAMS = [
 			'use_relu': True,
 			'asymmetric': False,
 			'dilated': 1,
-			'input_channels': 16,
+			'input_channels': 32,
 			'output_channels': 64,
 			'downsample': True,
 			'dropout_prob': 0.01
@@ -293,9 +293,9 @@ class InitialBlock(nn.Module):
 	def __init__(self):
 		super().__init__()
 
-		self.conv = nn.Conv2d(3, 13, (3, 3), stride=2, padding=1, bias=True)
+		self.conv = nn.Conv2d(3, 29, (3, 3), stride=2, padding=1, bias=True)
 		self.pool = nn.MaxPool2d(2, stride=2)
-		self.batch_norm = nn.BatchNorm2d(16, eps=1e-3)
+		self.batch_norm = nn.BatchNorm2d(32, eps=1e-3)
 
 	def forward(self, input):
 		output = torch.cat([self.conv(input), self.pool(input)], 1)

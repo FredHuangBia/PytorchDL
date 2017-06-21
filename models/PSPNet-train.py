@@ -54,6 +54,9 @@ class myTrainer():
 			if len(targetXmls) < self.opt.visTrain:
 				targetXmls.append(targetXml)
 				outputs.append(output)
+
+			del output, loss, ipt, targetXml
+
 		if epoch % self.opt.visEpoch == 0:
 			self.visualize(targetXmls, outputs, epoch, 'train', trainLoader.dataset.postprocessXml())
 
@@ -72,8 +75,6 @@ class myTrainer():
 		outputs = []
 		avgLoss = 0
 		for i, (ipt, targetXml) in enumerate(tqdm(valLoader)):
-			if i == 100:
-				break
 			ipt, targetXml = Variable(ipt), Variable(targetXml)
 			if self.opt.GPU:
 				ipt = ipt.cuda()
@@ -85,6 +86,9 @@ class myTrainer():
 			if len(targetXmls) < self.opt.visVal:
 				targetXmls.append(targetXml)
 				outputs.append(output)
+
+			del output, loss, ipt, targetXml
+
 		if epoch % self.opt.visEpoch == 0:
 			self.visualize(targetXmls, outputs, epoch, 'val', valLoader.dataset.postprocessXml())
 
@@ -122,6 +126,10 @@ class myTrainer():
 			output = self.model.forward(ipt)
 			loss = self.criterion(output, targetXml)
 			avgLoss = (avgLoss * i + loss.data[0]) / (i + 1)
+			del output, loss, ipt, targetXml
+
+		if epoch % self.opt.visEpoch == 0:
+			self.visualize(targetXmls, outputs, epoch, 'test', testLoader.dataset.postprocessXml())
 
 		print('==> Finish test epoch: %d' %epoch)
 		print('Average loss: \033[1;36m%.5f\033[0m' %avgLoss)

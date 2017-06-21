@@ -46,7 +46,7 @@ if __name__=='__main__':
 		sys.exit()
 
 	if opt.testOnly:
-		trainer.test(testLoader, startEpoch-1)
+		trainer.test(valLoader, startEpoch-1) # val Loader has label
 		sys.exit()
 		
 	for epoch in range(startEpoch, opt.nEpochs+1):
