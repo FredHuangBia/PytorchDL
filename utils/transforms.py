@@ -14,10 +14,21 @@ def addNoise(ipt, miu, std):
 def scaleRGB(ipt):
 	return np.float32(ipt/255)
 
+def unScaleRGB(ipt):
+	opt = ipt*255
+	opt = opt.astype(np.uint8)
+	return opt
+
 def normalize(ipt, mean, std):
 	ipt[:][:][0] = (ipt[:][:][0] - mean[0]) / std[0]
 	ipt[:][:][1] = (ipt[:][:][1] - mean[1]) / std[1]
 	ipt[:][:][2] = (ipt[:][:][2] - mean[2]) / std[2]
+	return ipt
+
+def unNormalize(ipt, mean, std):
+	ipt[:][:][0] = (ipt[:][:][0] * std[0]) + mean[0]
+	ipt[:][:][1] = (ipt[:][:][1] * std[1]) + mean[1]
+	ipt[:][:][2] = (ipt[:][:][2] * std[2]) + mean[2]
 	return ipt
 
 def randomFlip(ipt, xml):

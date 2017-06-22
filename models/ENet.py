@@ -1,14 +1,8 @@
 "code borrow and modified from https://gist.github.com/ndronen/19154831c2049a69e8d53dea8cf3e744"
 """
-A quick, partial implementation of ENet (https://arxiv.org/abs/1606.02147) using PyTorch.
-The original Torch ENet implementation can process a 480x360 image in ~12 ms (on a P2 AWS
-instance).  TensorFlow takes ~35 ms.  The PyTorch implementation takes ~25 ms, an improvement
-over TensorFlow, but worse than the original Torch.
+A complete implementation of ENet (https://arxiv.org/abs/1606.02147) using PyTorch.
 """
 
-# import sys
-# import time
-# from torch.autograd import Variable
 import torch
 import torch.optim
 import torch.nn as nn
@@ -21,7 +15,7 @@ ENCODER_PARAMS = [
 			'use_relu': True,
 			'asymmetric': False,
 			'dilated': 1,
-			'input_channels': 32,
+			'input_channels': 16,
 			'output_channels': 64,
 			'downsample': True,
 			'dropout_prob': 0.01
@@ -40,7 +34,7 @@ ENCODER_PARAMS = [
 			'internal_scale': 4,
 			'use_relu': True,
 			'asymmetric': False,
-			'dilated': 2,
+			'dilated': 1,
 			'input_channels': 64,
 			'output_channels': 64,
 			'downsample': False,
@@ -60,7 +54,7 @@ ENCODER_PARAMS = [
 			'internal_scale': 4,
 			'use_relu': True,
 			'asymmetric': False,
-			'dilated': 2,
+			'dilated': 1,
 			'input_channels': 64,
 			'output_channels': 64,
 			'downsample': False,
@@ -90,76 +84,6 @@ ENCODER_PARAMS = [
 			'internal_scale': 4,
 			'use_relu': True,
 			'asymmetric': False,
-			'dilated': 4,
-			'input_channels': 128,
-			'output_channels': 128,
-			'downsample': False,
-			'dropout_prob': 0.1
-		},
-		{
-			'internal_scale': 4,
-			'use_relu': True,
-			'asymmetric': False,
-			'dilated': 1,
-			'input_channels': 128,
-			'output_channels': 128,
-			'downsample': False,
-			'dropout_prob': 0.1
-		},
-		{
-			'internal_scale': 4,
-			'use_relu': True,
-			'asymmetric': False,
-			'dilated': 4,
-			'input_channels': 128,
-			'output_channels': 128,
-			'downsample': False,
-			'dropout_prob': 0.1
-		},
-		{
-			'internal_scale': 4,
-			'use_relu': True,
-			'asymmetric': False,
-			'dilated': 1,
-			'input_channels': 128,
-			'output_channels': 128,
-			'downsample': False,
-			'dropout_prob': 0.1
-		},
-		{
-			'internal_scale': 4,
-			'use_relu': True,
-			'asymmetric': False,
-			'dilated': 8,
-			'input_channels': 128,
-			'output_channels': 128,
-			'downsample': False,
-			'dropout_prob': 0.1
-		},
-		{
-			'internal_scale': 4,
-			'use_relu': True,
-			'asymmetric': False,
-			'dilated': 1,
-			'input_channels': 128,
-			'output_channels': 128,
-			'downsample': False,
-			'dropout_prob': 0.1
-		},
-		{
-			'internal_scale': 4,
-			'use_relu': True,
-			'asymmetric': False,
-			'dilated': 8,
-			'input_channels': 128,
-			'output_channels': 128,
-			'downsample': False,
-			'dropout_prob': 0.1
-		},
-		{
-			'internal_scale': 4,
-			'use_relu': True,
-			'asymmetric': False,
 			'dilated': 1,
 			'input_channels': 128,
 			'output_channels': 128,
@@ -179,7 +103,7 @@ ENCODER_PARAMS = [
 		{
 			'internal_scale': 4,
 			'use_relu': True,
-			'asymmetric': False,
+			'asymmetric': True,
 			'dilated': 1,
 			'input_channels': 128,
 			'output_channels': 128,
@@ -219,7 +143,7 @@ ENCODER_PARAMS = [
 		{
 			'internal_scale': 4,
 			'use_relu': True,
-			'asymmetric': False,
+			'asymmetric': True,
 			'dilated': 1,
 			'input_channels': 128,
 			'output_channels': 128,
@@ -241,6 +165,76 @@ ENCODER_PARAMS = [
 			'use_relu': True,
 			'asymmetric': False,
 			'dilated': 1,
+			'input_channels': 128,
+			'output_channels': 128,
+			'downsample': False,
+			'dropout_prob': 0.1
+		},
+		{
+			'internal_scale': 4,
+			'use_relu': True,
+			'asymmetric': False,
+			'dilated': 2,
+			'input_channels': 128,
+			'output_channels': 128,
+			'downsample': False,
+			'dropout_prob': 0.1
+		},
+		{
+			'internal_scale': 4,
+			'use_relu': True,
+			'asymmetric': True,
+			'dilated': 1,
+			'input_channels': 128,
+			'output_channels': 128,
+			'downsample': False,
+			'dropout_prob': 0.1
+		},
+		{
+			'internal_scale': 4,
+			'use_relu': True,
+			'asymmetric': False,
+			'dilated': 4,
+			'input_channels': 128,
+			'output_channels': 128,
+			'downsample': False,
+			'dropout_prob': 0.1
+		},
+		{
+			'internal_scale': 4,
+			'use_relu': True,
+			'asymmetric': False,
+			'dilated': 1,
+			'input_channels': 128,
+			'output_channels': 128,
+			'downsample': False,
+			'dropout_prob': 0.1
+		},
+		{
+			'internal_scale': 4,
+			'use_relu': True,
+			'asymmetric': False,
+			'dilated': 8,
+			'input_channels': 128,
+			'output_channels': 128,
+			'downsample': False,
+			'dropout_prob': 0.1
+		},
+		{
+			'internal_scale': 4,
+			'use_relu': True,
+			'asymmetric': True,
+			'dilated': 1,
+			'input_channels': 128,
+			'output_channels': 128,
+			'downsample': False,
+			'dropout_prob': 0.1
+		},
+		{
+			'internal_scale': 4,
+			'use_relu': True,
+			'asymmetric': False,
+			'dilated': 16,
 			'input_channels': 128,
 			'output_channels': 128,
 			'downsample': False,
@@ -276,13 +270,13 @@ DECODER_PARAMS = [
 		},
 		{
 			'input_channels': 64,
-			'output_channels': 32,
+			'output_channels': 16,
 			'upsample': True,
 			'pooling_module': None
 		},
 		{
-			'input_channels': 32,
-			'output_channels': 32,
+			'input_channels': 16,
+			'output_channels': 16,
 			'upsample': False,
 			'pooling_module': None
 		}
@@ -293,9 +287,9 @@ class InitialBlock(nn.Module):
 	def __init__(self):
 		super().__init__()
 
-		self.conv = nn.Conv2d(3, 29, (3, 3), stride=2, padding=1, bias=True)
+		self.conv = nn.Conv2d(3, 13, (3, 3), stride=2, padding=1, bias=True)
 		self.pool = nn.MaxPool2d(2, stride=2)
-		self.batch_norm = nn.BatchNorm2d(32, eps=1e-3)
+		self.batch_norm = nn.BatchNorm2d(16, eps=1e-3)
 
 	def forward(self, input):
 		output = torch.cat([self.conv(input), self.pool(input)], 1)
@@ -316,10 +310,14 @@ class EncoderMainPath(nn.Module):
 		self.input_conv = nn.Conv2d(input_channels, internal_channels, input_stride, stride=input_stride, padding=0, bias=False)
 		self.input_batch_norm = nn.BatchNorm2d(internal_channels, eps=1e-03)
 
-		# TODO: use asymmetric convolutions, as in the
-		# original implementation.  For now just add a 3x3 convolution.
-		self.middle_conv = nn.Conv2d( internal_channels, internal_channels, 3, stride=1, padding=dilated, bias=True, dilation=dilated)
-		self.middle_batch_norm = nn.BatchNorm2d(internal_channels, eps=1e-03)
+		if asymmetric == True:
+			self.middle_conv = nn.Conv2d( internal_channels, internal_channels, (5,1), stride=1, padding=(2,0), bias=True, dilation=1)
+			self.middle_batch_norm = nn.BatchNorm2d(internal_channels, eps=1e-03)
+			self.middle_conv = nn.Conv2d( internal_channels, internal_channels, (1,5), stride=1, padding=(0,2), bias=True, dilation=1)
+			self.middle_batch_norm = nn.BatchNorm2d(internal_channels, eps=1e-03)
+		else:
+			self.middle_conv = nn.Conv2d( internal_channels, internal_channels, 3, stride=1, padding=dilated, bias=True, dilation=dilated)
+			self.middle_batch_norm = nn.BatchNorm2d(internal_channels, eps=1e-03)
 
 		self.output_conv = nn.Conv2d(internal_channels, output_channels, 1, stride=1, padding=0, bias=False)
 		self.output_batch_norm = nn.BatchNorm2d(output_channels, eps=1e-03)
@@ -501,7 +499,7 @@ class Decoder(nn.Module):
 			layer_name = 'decoder{:02d}'.format(i)
 			super().__setattr__(layer_name, layer)
 
-		self.output_conv = nn.ConvTranspose2d(32, nclasses, 2, stride=2, padding=0, output_padding=0, bias=True)
+		self.output_conv = nn.ConvTranspose2d(16, nclasses, 2, stride=2, padding=0, output_padding=0, bias=True)
 
 	def forward(self, input):
 		output = self.encoder(input, predict=False)

@@ -36,6 +36,7 @@ class myTrainer():
 		print('\n')
 		print('==> Start train epoch: ' + str(epoch))
 
+		inputs = []
 		targetXmls = []
 		outputs = []
 		avgLoss = 0
@@ -52,14 +53,15 @@ class myTrainer():
 			self.optimizer.step()
 
 			if len(targetXmls) < self.opt.visTrain:
+				inputs.append(ipt.cpu().data)
 				targetXmls.append(targetXml.cpu().data)
 				outputs.append(output.cpu().data)
 
 			del output, loss, ipt, targetXml
 
 		if epoch % self.opt.visEpoch == 0:
-			self.visualize(targetXmls, outputs, epoch, 'train', trainLoader.dataset.postprocessXml())
-			del targetXmls, outputs
+			self.visualize(inputs, targetXmls, outputs, epoch, 'train', trainLoader.dataset.postprocessXml(), trainLoader.dataset.postprocessData())
+			del inputs, targetXmls, outputs
 
 		self.logger['train'].write('%d %f\n' %(epoch, avgLoss))		
 		print('==> Finish train epoch: %d' %epoch)
@@ -72,6 +74,8 @@ class myTrainer():
 		self.model.eval()
 		print('\n')
 		print('==> Start val epoch: ' + str(epoch))
+
+		inputs = []
 		targetXmls = []
 		outputs = []
 		avgLoss = 0
@@ -85,33 +89,27 @@ class myTrainer():
 			avgLoss = (avgLoss * i + loss.data[0]) / (i + 1)
 
 			if len(targetXmls) < self.opt.visVal:
+				inputs.append(ipt.cpu().data)
 				targetXmls.append(targetXml.cpu().data)
 				outputs.append(output.cpu().data)
 
 			del output, loss, ipt, targetXml
 
 		if epoch % self.opt.visEpoch == 0:
-			self.visualize(targetXmls, outputs, epoch, 'val', valLoader.dataset.postprocessXml())
-			del targetXmls, outputs
+			self.visualize(inputs, targetXmls, outputs, epoch, 'val', valLoader.dataset.postprocessXml(), valLoader.dataset.postprocessData())
+			del inputs, targetXmls, outputs
 
 		self.logger['val'].write('%d %f\n' %(epoch, avgLoss))
 		print('==> Finish val epoch: %d' %epoch)
 		print('Average loss: \033[1;36m%.5f\033[0m' %avgLoss)
 		return avgLoss
 
-	def visualize(self, targetXmls, outputs, epoch, split, postprocessXml):
-		targetImgs = []
-		outputImgs = []
-		for i in range(self.opt.visVal):
-			for j in range(self.opt.batchSize):
-				targetImgs.append(postprocessXml(targetXmls[i][j].numpy()))
-				outputImgs.append(postprocessXml(np.argmax(outputs[i][j].numpy(), 0)))
-		vis.writeImgHTML(targetImgs, outputImgs, epoch, split, self.opt)
-
 	def test(self, testLoader, epoch):
 		self.model.eval()
 		print('\n')
 		print('==> Start test epoch: ' + str(epoch))
+
+		inputs = []
 		targetXmls = []
 		outputs = []
 		avgLoss = 0
@@ -127,19 +125,32 @@ class myTrainer():
 			avgLoss = (avgLoss * i + loss.data[0]) / (i + 1)
 
 			if len(targetXmls) < self.opt.visTest:
+				inputs.append(ipt.cpu().data)
 				targetXmls.append(targetXml.cpu().data)
 				outputs.append(output.cpu().data)
 
 			del output, loss, ipt, targetXml
 
 		if epoch % self.opt.visEpoch == 0:
-			self.visualize(targetXmls, outputs, epoch, 'test', testLoader.dataset.postprocessXml())
-			del targetXmls, outputs
+			self.visualize(inputs, targetXmls, outputs, epoch, 'test', testLoader.dataset.postprocessXml(), testLoader.dataset.postprocessData())
+			del inputs, targetXmls, outputs
 
 		self.logger['val'].write('%d %f\n' %(epoch, avgLoss))
 		print('==> Finish val epoch: %d' %epoch)
 		print('Average loss: \033[1;36m%.5f\033[0m' %avgLoss)
 		return avgLoss
+
+	def visualize(self, inputs, targetXmls, outputs, epoch, split, postprocessXml, postprocessData):
+		inputImgs = []
+		targetImgs = []
+		outputImgs = []
+		for i in range(self.opt.visVal):
+			for j in range(self.opt.batchSize):
+				inputImgs.append(postprocessData(inputs[i][j].numpy()))
+				targetImgs.append(postprocessXml(targetXmls[i][j].numpy()))
+				outputImgs.append(postprocessXml(np.argmax(outputs[i][j].numpy(), 0)))
+		vis.writeImgHTML(inputImgs, targetImgs, outputImgs, epoch, split, self.opt)
+
 
 def createTrainer(model, criterion, opt, optimState):
 	trainer = myTrainer(model, criterion, opt, optimState)

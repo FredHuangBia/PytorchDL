@@ -22,7 +22,7 @@ def renderTable(targetCaps, outputCaps, ncoln):
 	htmlStr += '</table>\n'
 	return htmlStr
 
-def renderImgTable(targetImgs, outputImgs, ncoln, imgDir):
+def renderImgTable(inputImgs, targetImgs, outputImgs, ncoln, imgDir):
 	assert len(targetImgs) == len(outputImgs), 'Target and output Imgs dimension mismatch.'
 	htmlStr = '<table border="1">\n'
 	for row in range(math.ceil(len(targetImgs)/ncoln)):
@@ -30,10 +30,13 @@ def renderImgTable(targetImgs, outputImgs, ncoln, imgDir):
 		for coln in range(ncoln):
 			ID = row*ncoln + coln
 			htmlStr += '<td>'
+			img = Image.fromarray(np.uint8(inputImgs[ID]), 'RGB')
+			img.save(os.path.join(imgDir, 'input-%d.png'%ID))
 			img = Image.fromarray(np.uint8(targetImgs[ID]), 'RGB')
 			img.save(os.path.join(imgDir, 'target-%d.png'%ID))
 			img = Image.fromarray(np.uint8(outputImgs[ID]), 'RGB')
 			img.save(os.path.join(imgDir, 'output-%d.png'%ID))
+			htmlStr += '<img src="imgs/input-%d.png" style="width:800px;height:400px;">' %ID
 			htmlStr += '<img src="imgs/target-%d.png" style="width:800px;height:400px;">' %ID
 			htmlStr += '<img src="imgs/output-%d.png" style="width:800px;height:400px;">' %ID
 			htmlStr += '</td>'
@@ -54,7 +57,7 @@ def writeHTML(targetCaps, outputCaps, epoch, split, opt):
 	f.write('</body>\n</html>\n')
 	f.close()
 
-def writeImgHTML(targetImgs, outputImgs, epoch, split, opt):
+def writeImgHTML(inputImgs, targetImgs, outputImgs, epoch, split, opt):
 	print('==> Writing visualize html ...')
 	htmlFile = 'index.html'
 
@@ -68,7 +71,7 @@ def writeImgHTML(targetImgs, outputImgs, epoch, split, opt):
 
 	f = open(os.path.join(rootDir, htmlFile), 'w')
 	f.write('<html>\n<body>\n')
-	table = renderImgTable(targetImgs, outputImgs, opt.visWidth, imgDir)
+	table = renderImgTable(inputImgs, targetImgs, outputImgs, opt.visWidth, imgDir)
 	f.write(table)
 	f.write('</body>\n</html>\n')
 	f.close()

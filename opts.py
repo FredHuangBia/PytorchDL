@@ -26,11 +26,11 @@ class opts:
 		parser.add_argument('--trainPctg',       default=1.00,           type=float, help='Percentage of training images')
 	    # Training/testing options
 		parser.add_argument('--nEpochs',         default=120,            type=int,   help='Number of total epochs to run')
-		parser.add_argument('--epochNum',        default=0,              type=int,   help='0=retrain|-1=latest|-2=best', choices=[0,-1,-2])
+		parser.add_argument('--epochNum',        default=-2,              type=int,   help='0=retrain|-1=latest|-2=best', choices=[0,-1,-2])
 		parser.add_argument('--saveEpoch',       default=80,             type=int,   help='saving at least # epochs')
 		parser.add_argument('--saveOne',         default=True,           type=bool,  help='Only preserve one saved model')
 		parser.add_argument('--batchSize',       default=1,              type=int,   help='mini-batch size')
-		parser.add_argument('--dropout',         default=0.5,            type=float, help='zero rate of dropout')
+		parser.add_argument('--dropout',         default=0.1,            type=float, help='zero rate of dropout')
 		parser.add_argument('--valOnly',         default=False,          type=bool,  help='Run on validation set only')
 		parser.add_argument('--testOnly',        default=False,          type=bool,  help='Run the test to see the performance')
 		parser.add_argument('--visEpoch',        default=10,             type=int,   help='Visualizing every n epochs')

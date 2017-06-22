@@ -75,7 +75,10 @@ class myDataset(Dataset):
 
 	def postprocessData(self):
 		def process(ipt):
-			processed = ipt
+			processed = np.swapaxes(ipt, 0, 2)
+			processed = np.swapaxes(processed, 0, 1)
+			processed = t.unNormalize(processed, self.opt.ImNetMean, self.opt.ImNetStd)
+			processed = t.unScaleRGB(processed)
 			return processed
 		return process
 
