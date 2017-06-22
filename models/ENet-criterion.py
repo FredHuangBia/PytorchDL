@@ -17,6 +17,15 @@ def initCriterion(criterion, model):
 	pass
 
 def createCriterion(opt, model):
-	criterion = CrossEntropyLoss2d()
+	weight = torch.ones(opt.numClasses)
+	# weight[19] = 0.5
+	# weight[5] = 5
+	# weight[6] = 8
+	# weight[7] = 8
+	# weight[11] = 5
+	# weight[12] = 5
+	# weight[17] = 5
+	# weight[18] = 5
+	criterion = CrossEntropyLoss2d(weight)
 
 	return criterion
