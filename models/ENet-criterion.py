@@ -9,6 +9,7 @@ class CrossEntropyLoss2d(nn.Module):
 
 	def forward(self, outputs, targets):
 		return self.loss(F.log_softmax(outputs), targets)
+		# return self.loss(outputs, targets)
 
 def initCriterion(criterion, model):
 	# if isinstance(criterion, nn.MultiCriterion) or isinstance(criterion, nn.ParallelCriterion):
@@ -18,14 +19,14 @@ def initCriterion(criterion, model):
 
 def createCriterion(opt, model):
 	weight = torch.ones(opt.numClasses)
-	# weight[19] = 0.5
-	# weight[5] = 5
-	# weight[6] = 8
-	# weight[7] = 8
-	# weight[11] = 5
-	# weight[12] = 5
-	# weight[17] = 5
-	# weight[18] = 5
+	weight[19] = 0.1
+	weight[5] = 2
+	weight[6] = 2
+	weight[7] = 2
+	weight[11] = 2
+	weight[12] = 2
+	weight[17] = 2
+	weight[18] = 2
 	criterion = CrossEntropyLoss2d(weight)
 
 	return criterion

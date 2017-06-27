@@ -114,7 +114,7 @@ class myTrainer():
 		outputs = []
 		avgLoss = 0
 		for i, (ipt, targetXml) in enumerate(tqdm(testLoader)):
-			if i == 5:
+			if i == 10:
 				break
 			ipt, targetXml = Variable(ipt), Variable(targetXml)
 			if self.opt.GPU:
@@ -135,8 +135,7 @@ class myTrainer():
 			self.visualize(inputs, targetXmls, outputs, epoch, 'test', testLoader.dataset.postprocessXml(), testLoader.dataset.postprocessData())
 			del inputs, targetXmls, outputs
 
-		self.logger['val'].write('%d %f\n' %(epoch, avgLoss))
-		print('==> Finish val epoch: %d' %epoch)
+		print('==> Finish test epoch: %d' %epoch)
 		print('Average loss: \033[1;36m%.5f\033[0m' %avgLoss)
 		return avgLoss
 
@@ -144,7 +143,7 @@ class myTrainer():
 		inputImgs = []
 		targetImgs = []
 		outputImgs = []
-		for i in range(self.opt.visVal):
+		for i in range(len(inputs)):
 			for j in range(self.opt.batchSize):
 				inputImgs.append(postprocessData(inputs[i][j].numpy()))
 				targetImgs.append(postprocessXml(targetXmls[i][j].numpy()))

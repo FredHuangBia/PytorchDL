@@ -48,6 +48,7 @@ class myDataset(Dataset):
 		xmlRaw = np.asarray(xmlRaw, dtype=np.int64)
 
 		dataRaw, xmlRaw = self.preprocess(dataRaw, xmlRaw)
+		# print(dataRaw)
 
 		dataRaw = np.swapaxes(dataRaw, 0, 2)
 		dataRaw = np.swapaxes(dataRaw, 1, 2)

@@ -1,4 +1,4 @@
-"code borrow and modified from piwise on GitHub"
+"code borrow and modified from piwise on GitHub and modified"
 import torch.nn as nn
 import torch.backends.cudnn as cudnn
 import torch
@@ -7,23 +7,30 @@ import torch.nn.functional as F
 from torchvision import models
 
 class PSPDec(nn.Module):
-	def __init__(self, in_features, out_features, downsize, upsize):
+	def __init__(self, in_features, out_features, downsize):
 		super().__init__()
-
-		self.features = nn.Sequential(
-			nn.AvgPool2d(downsize, stride=downsize),
-			nn.Conv2d(in_features, out_features, 1, bias=False),
-			nn.BatchNorm2d(out_features, momentum=.95),
-			nn.ReLU(inplace=True),
-			nn.UpsamplingBilinear2d(upsize)
-		)
+		self.downsize = downsize
+		self.conv = nn.Conv2d(in_features, out_features, 1, bias=False)
+		self.bn = nn.BatchNorm2d(out_features, momentum=.95)
+		self.relu = nn.ReLU(inplace=True)
 
 	def forward(self, x):
-		return self.features(x)
+		if self.downsize == None:
+			downsize = (1,1)
+		else:
+			downsize = ( int(x.size()[2]/self.downsize[0]), int(x.size()[3]/self.downsize[1]) )
+		upsize = (x.size()[2], x.size()[3])
+		output = F.avg_pool2d(x, downsize, stride=downsize)
+		output = self.conv(output)
+		output = self.bn(output)
+		output = self.relu(output)
+		output = F.upsample_bilinear(output, upsize)
+		return output
 
 class myModel(nn.Module):
 	def __init__(self, opt):
 		super().__init__()
+		self.opt = opt
 
 		if opt.netSpec == 'resnet101':
 			resnet = models.resnet101(pretrained=opt.pretrain)
@@ -43,15 +50,11 @@ class myModel(nn.Module):
 			if isinstance(m, nn.BatchNorm2d):
 				m.requires_grad = False
 
-		height = int(opt.cropedSize[0]*opt.downRate)
-		width = int(opt.cropedSize[1]*opt.downRate)
-		hw = (height, width)
-
-		self.layer5a = PSPDec(512, 128, (int(hw[0]/1),  int(hw[1]/1)), hw)
-		self.layer5b = PSPDec(512, 128, (int(hw[0]/4),  int(hw[1]/8)), hw)
-		self.layer5c = PSPDec(512, 128, (int(hw[0]/16), int(hw[1]/32)), hw)
-		self.layer5d = PSPDec(512, 128, (int(hw[0]/64), int(hw[1]/128)), hw)
-		self.layer5e = PSPDec(512, 128, (1, 1), hw)
+		self.layer5a = PSPDec(512, 128, (1,1))
+		self.layer5b = PSPDec(512, 128, (3,3))
+		self.layer5c = PSPDec(512, 128, (8,16))
+		self.layer5d = PSPDec(512, 128, (32,64))
+		self.layer5e = PSPDec(512, 128, None)
 
 		self.final = nn.Sequential(
 			nn.Conv2d(128*5, 128, 3, padding=1, bias=False),
@@ -82,10 +85,9 @@ class myModel(nn.Module):
 		], 1)
 		# print('cated', x.size())
 		final = self.final(x)
-		# print('final', final.size())
-		# final = F.upsample_bilinear(final, x.size()[2:])
-		final = F.upsample_bilinear(final, (1024,2048))
-		# print('upsample', final.size())
+		upsize = ( int(x.size()[2]/self.opt.downRate), int(x.size()[3]/self.opt.downRate) )
+		#TODO: opt size and target xml size mismatch
+		final = F.upsample_bilinear(final, upsize )
 
 		return final
 
