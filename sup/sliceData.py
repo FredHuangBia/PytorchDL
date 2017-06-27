@@ -5,7 +5,7 @@ from tqdm import tqdm
 
 
 dataRoot = '../../../data'
-mat = si.loadmat('/home/alvaro/Fred/data/train_data_lateral_EKF.mat')
+mat = si.loadmat('./train_data_lateral_EKF.mat')
 lp = mat['lp'][0]   # lat pos
 lsp = mat['lsp'][0] # lat spd
 eH = mat['eH'][0]   # error heading

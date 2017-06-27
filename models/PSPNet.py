@@ -20,6 +20,7 @@ class PSPDec(nn.Module):
 		else:
 			downsize = ( int(x.size()[2]/self.downsize[0]), int(x.size()[3]/self.downsize[1]) )
 		upsize = (x.size()[2], x.size()[3])
+
 		output = F.avg_pool2d(x, downsize, stride=downsize)
 		output = self.conv(output)
 		output = self.bn(output)
@@ -88,7 +89,6 @@ class myModel(nn.Module):
 		upsize = ( int(x.size()[2]/self.opt.downRate), int(x.size()[3]/self.opt.downRate) )
 		#TODO: opt size and target xml size mismatch
 		final = F.upsample_bilinear(final, upsize )
-
 		return final
 
 def createModel(opt):

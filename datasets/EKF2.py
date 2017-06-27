@@ -29,7 +29,7 @@ class myDataset(Dataset):
 
 	def preprocessData(self, ipt):
 		if self.split == 'train':
-			processed = t.addNoise(ipt, 0, 0.001)
+			processed = t.thAddNoise(ipt, 0, 0.001)
 			return processed
 		elif self.split == 'val':
 			processed = ipt

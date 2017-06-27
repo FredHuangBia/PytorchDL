@@ -11,6 +11,12 @@ def addNoise(ipt, miu, std):
 	noise = np.float32(noise)
 	return ipt + noise
 
+
+def thAddNoise(ipt, miu, std):
+	noise = np.random.normal(miu, std, ipt.size())
+	noise = torch.from_numpy(np.float32(noise))
+	return ipt + noise
+
 def scaleRGB(ipt):
 	return np.float32(ipt/255)
 

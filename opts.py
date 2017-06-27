@@ -21,15 +21,15 @@ class opts:
 		parser.add_argument('--www',             default='../../www',    type=str,   help='Path to visualization' )
 		# Data options
 		parser.add_argument('--nThreads',        default=2,              type=int,   help='Number of data loading threads' )
-		parser.add_argument('--dataset',         default='CityScapesF',  type=str,   help='Name of dataset' ,choices=['EKF2','CityScapesF'])
+		parser.add_argument('--dataset',         default='EKF2',         type=str,   help='Name of dataset' ,choices=['EKF2','CityScapesF'])
 		parser.add_argument('--maxImgs',         default=100000,         type=int,   help='Number of images in train+val')
-		parser.add_argument('--trainPctg',       default=1.00,           type=float, help='Percentage of training images')
+		parser.add_argument('--trainPctg',       default=0.95,           type=float, help='Percentage of training images')
 		# Training/testing options
 		parser.add_argument('--nEpochs',         default=120,            type=int,   help='Number of total epochs to run')
 		parser.add_argument('--epochNum',        default=0,              type=int,   help='0=retrain|-1=latest|-2=best', choices=[0,-1,-2])
 		parser.add_argument('--saveEpoch',       default=80,             type=int,   help='saving at least # epochs')
 		parser.add_argument('--saveOne',         default=True,           type=bool,  help='Only preserve one saved model')
-		parser.add_argument('--batchSize',       default=1,              type=int,   help='mini-batch size')
+		parser.add_argument('--batchSize',       default=16,             type=int,   help='mini-batch size')
 		parser.add_argument('--dropout',         default=0.1,            type=float, help='zero rate of dropout')
 		parser.add_argument('--valOnly',         default=False,          type=bool,  help='Run on validation set only')
 		parser.add_argument('--testOnly',        default=False,          type=bool,  help='Run the test to see the performance')
@@ -47,14 +47,14 @@ class opts:
 		parser.add_argument('--dampening',       default=0,              type=float, help='dampening')
 		parser.add_argument('--optimizer',       default='Adam',         type=str,   help='optimizer type, more choices available', choices=['SGD','Adam'])
 		# Model options
-		parser.add_argument('--netType',         default='PSPNet',         type=str,   help='Your defined model name', choices=['CNN5','MCCNN','PSPNet','ENet'])
+		parser.add_argument('--netType',         default='CNN5',         type=str,   help='Your defined model name', choices=['CNN5','MCCNN','PSPNet','ENet'])
 		parser.add_argument('--netSpec',         default='resnet34',     type=str,   help='Other model to be loaded', choices=['custom','resnet101','resnet34'])
 		parser.add_argument('--pretrain',        default=True,           type=bool,  help='Pretrained or not')
-		parser.add_argument('--L1Loss',          default=0,              type=float, help='Weight for abs derender criterion')
+		parser.add_argument('--L1Loss',          default=1,              type=float, help='Weight for abs derender criterion')
 		parser.add_argument('--mseLoss',         default=0,              type=float, help='Weight for mse derender criterion')
 		parser.add_argument('--ceLoss',          default=0,              type=float, help='Weight for cross-entrophy derender criterion')
 		parser.add_argument('--gdlLoss',         default=0,              type=float, help='Weight for gdl derender criterion')
-		parser.add_argument('--customLoss',      default=1,              type=float, help='Weight for custom derender criterion')
+		parser.add_argument('--customLoss',      default=0,              type=float, help='Weight for custom derender criterion')
 		# Other model options
 		parser.add_argument('--nmsThres',        default=0.5,            type=float, help='Threshold for non-max suppression')
 		parser.add_argument('--resetClassifier', default=False,          type=bool,  help='Reset the fully connected layer for fine-tuning')
@@ -81,6 +81,7 @@ class opts:
 			self.args.lspMax = 1.976027
 			self.args.ehMin = -0.067614
 			self.args.ehMax = 0.064971
+
 		elif self.args.dataset == 'CityScapesF':
 			self.args.downRate = 1.0
 			self.args.ImNetMean = (0.485, 0.456, 0.406)
