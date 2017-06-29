@@ -2,6 +2,13 @@
 
 PytorchDL is a general deep learning code using pytorch. The code can be easy modified to train new models and use new datasets. 
 
+Semantic segmentation models:
++ [x] PSPNet
++ [x] ENet
++ [x] ERFNet
++ [ ] DUC
++ [ ] GCN
++ [ ] FRRN
 # Code Structure
 
 There are 5 main subfolders in this repo: 

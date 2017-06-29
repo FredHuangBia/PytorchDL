@@ -20,46 +20,46 @@ class opts:
 		parser.add_argument('--resume',          default='../../models', type=str,   help='Path to checkpoint' )
 		parser.add_argument('--www',             default='../../www',    type=str,   help='Path to visualization' )
 		# Data options
-		parser.add_argument('--nThreads',        default=4,              type=int,   help='Number of data loading threads' )
-		parser.add_argument('--dataset',         default='CityScapesF',  type=str,   help='Name of dataset' ,choices=['EKF2','CityScapesF'])
+		parser.add_argument('--nThreads',        default=2,              type=int,   help='Number of data loading threads' )
+		parser.add_argument('--dataset',         default='EKF2',         type=str,   help='Name of dataset' ,choices=['EKF2','CityScapesF'])
 		parser.add_argument('--maxImgs',         default=100000,         type=int,   help='Number of images in train+val')
-		parser.add_argument('--trainPctg',       default=1.00,           type=float, help='Percentage of training images')
+		parser.add_argument('--trainPctg',       default=0.95,           type=float, help='Percentage of training images')
 		# Training/testing options
 		parser.add_argument('--nEpochs',         default=120,            type=int,   help='Number of total epochs to run')
-		parser.add_argument('--epochNum',        default=-2,             type=int,   help='0=retrain|-1=latest|-2=best', choices=[0,-1,-2])
+		parser.add_argument('--epochNum',        default=0,              type=int,   help='0=retrain|-1=latest|-2=best', choices=[0,-1,-2])
 		parser.add_argument('--saveEpoch',       default=80,             type=int,   help='saving at least # epochs')
 		parser.add_argument('--saveOne',         default=True,           type=bool,  help='Only preserve one saved model')
-		parser.add_argument('--batchSize',       default=8,              type=int,   help='mini-batch size')
-		parser.add_argument('--dropout',         default=0.3,            type=float, help='zero rate of dropout')
+		parser.add_argument('--batchSize',       default=16,             type=int,   help='mini-batch size')
+		parser.add_argument('--dropout',         default=0.1,            type=float, help='zero rate of dropout')
 		parser.add_argument('--valOnly',         default=False,          type=bool,  help='Run on validation set only')
 		parser.add_argument('--testOnly',        default=False,          type=bool,  help='Run the test to see the performance')
-		parser.add_argument('--visEpoch',        default=5,              type=int,   help='Visualizing every n epochs')
-		parser.add_argument('--visTrain',        default=1,              type=int,   help='Visualizing training examples in unit of batchsize')
-		parser.add_argument('--visVal',          default=1,              type=int,   help='Visualizing validation examples in unit of batchsize')
-		parser.add_argument('--visTest',         default=1,              type=int,   help='Visualizing test examples in unit of batchsize')
+		parser.add_argument('--visEpoch',        default=10,             type=int,   help='Visualizing every n epochs')
+		parser.add_argument('--visTrain',        default=0,              type=int,   help='Visualizing training examples in unit of batchsize')
+		parser.add_argument('--visVal',          default=0,              type=int,   help='Visualizing validation examples in unit of batchsize')
+		parser.add_argument('--visTest',         default=10,             type=int,   help='Visualizing test examples in unit of batchsize')
 		parser.add_argument('--visWidth',        default=1,              type=int,   help='# images per row for visualization')
 		# Optimization options
-		parser.add_argument('--LR',              default=5e-4,           type=float, help='initial learning rate')
+		parser.add_argument('--LR',              default=0.01,           type=float, help='initial learning rate')
 		parser.add_argument('--LRDecay',         default='none',         type=str,   help='LRDecay', choices=['anneal','stepwise','pow','none'])
 		parser.add_argument('--LRDParam',        default=0,              type=float, help='param for learning rate decay')
 		parser.add_argument('--momentum',        default=0.9,            type=float, help='momentum')
-		parser.add_argument('--weightDecay',     default=2e-4,           type=float, help='weight decay')
+		parser.add_argument('--weightDecay',     default=1e-4,           type=float, help='weight decay')
 		parser.add_argument('--dampening',       default=0,              type=float, help='dampening')
 		parser.add_argument('--optimizer',       default='Adam',         type=str,   help='optimizer type, more choices available', choices=['SGD','Adam'])
 		# Model options
-		parser.add_argument('--netType',         default='ERFNet',       type=str,   help='Your defined model name', choices=['CNN5','MCCNN','PSPNet','ENet'])
-		parser.add_argument('--netSpec',         default='custom',       type=str,   help='Other model to be loaded', choices=['custom','resnet101','resnet34'])
-		parser.add_argument('--pretrain',        default=False,          type=bool,  help='Pretrained or not')
-		parser.add_argument('--L1Loss',          default=0,              type=float, help='Weight for abs derender criterion')
+		parser.add_argument('--netType',         default='CNN5',         type=str,   help='Your defined model name', choices=['CNN5','MCCNN','PSPNet','ENet'])
+		parser.add_argument('--netSpec',         default='resnet34',     type=str,   help='Other model to be loaded', choices=['custom','resnet101','resnet34'])
+		parser.add_argument('--pretrain',        default=True,           type=bool,  help='Pretrained or not')
+		parser.add_argument('--L1Loss',          default=1,              type=float, help='Weight for abs derender criterion')
 		parser.add_argument('--mseLoss',         default=0,              type=float, help='Weight for mse derender criterion')
 		parser.add_argument('--ceLoss',          default=0,              type=float, help='Weight for cross-entrophy derender criterion')
 		parser.add_argument('--gdlLoss',         default=0,              type=float, help='Weight for gdl derender criterion')
-		parser.add_argument('--customLoss',      default=1,              type=float, help='Weight for custom derender criterion')
+		parser.add_argument('--customLoss',      default=0,              type=float, help='Weight for custom derender criterion')
 		# Other model options
 		parser.add_argument('--nmsThres',        default=0.5,            type=float, help='Threshold for non-max suppression')
 		parser.add_argument('--resetClassifier', default=False,          type=bool,  help='Reset the fully connected layer for fine-tuning')
 		parser.add_argument('--numClasses',      default=20,             type=int,   help='Number of classes in the dataset')
-		parser.add_argument('--suffix',          default='audoEncoder',  type=str,   help='Suffix for saving the model')
+		parser.add_argument('--suffix',          default='none',         type=str,   help='Suffix for saving the model')
 		self.args = parser.parse_args()
 
 	def __init__(self):
@@ -96,12 +96,6 @@ class opts:
 		elif self.args.netType == 'PSPNet':
 			self.args.downRate = 0.25
 			self.args.branchOut = 128
-
-		elif self.args.netType == 'ERFNet':
-			self.args.prelus = False
-			self.args.downRate = 0.5
-			self.args.encoderOnly = False
-			self.args.encoderPath = '/home/titan/Fred/segment/models/CityScapesF_ERFNet_custom_pretrain=False_Loss=0-0-0-1_LR=0.0005_Suffix=encoder/model_best.pth'
 
 		self.args.visPerInst = 4
 		if self.args.visWidth == -1:

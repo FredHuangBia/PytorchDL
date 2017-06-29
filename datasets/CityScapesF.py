@@ -37,7 +37,7 @@ class myDataset(Dataset):
 		self.opt = opt
 		self.dir = info['basedir']
 
-	def __getitem__(self, index):
+	def __getitem__(self, index): # Specialy wrote for ERFNet
 		dataPath = self.dataInfo['dataPath'][index]
 		dataRaw = misc.imread(dataPath)
 		dataRaw = misc.imresize(dataRaw, self.opt.downRate)
@@ -45,15 +45,18 @@ class myDataset(Dataset):
 
 		xmlPath = self.dataInfo['xmlPath'][index]
 		xmlRaw = misc.imread(xmlPath)
+		if self.opt.encoderOnly:
+			xmlRaw = misc.imresize(xmlRaw, self.opt.downRate/8, interp='nearest')
+		else:
+			xmlRaw = misc.imresize(xmlRaw, self.opt.downRate, interp='nearest')
 		xmlRaw = np.asarray(xmlRaw, dtype=np.int64)
 
 		dataRaw, xmlRaw = self.preprocess(dataRaw, xmlRaw)
-		# print(dataRaw)
 
 		dataRaw = np.swapaxes(dataRaw, 0, 2)
 		dataRaw = np.swapaxes(dataRaw, 1, 2)
-		data = torch.from_numpy(dataRaw)
 
+		data = torch.from_numpy(dataRaw)
 		xml = torch.from_numpy(xmlRaw)
 
 		return data, xml
@@ -63,10 +66,10 @@ class myDataset(Dataset):
 
 	def preprocess(self, data, xml):
 		if self.split == 'train':
-			data, xml = t.randomSizeCrop(data, xml, 0.8)
+			# data, xml = t.randomSizeCrop(data, xml, 0.8)
 			data, xml = t.randomFlip(data, xml)
 			data = t.scaleRGB(data)
-			data = t.addNoise(data, 0, 0.005)
+			# data = t.addNoise(data, 0, 0.005)
 			data = t.normalize(data, self.opt.ImNetMean, self.opt.ImNetStd)
 			return data, xml
 		else:
