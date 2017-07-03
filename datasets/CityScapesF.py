@@ -70,18 +70,18 @@ class myDataset(Dataset):
 			data, xml = t.randomFlip(data, xml)
 			data = t.scaleRGB(data)
 			# data = t.addNoise(data, 0, 0.005)
-			data = t.normalize(data, self.opt.ImNetMean, self.opt.ImNetStd)
+			data = t.normalize(data, self.opt.CSFMean, self.opt.CSFStd)
 			return data, xml
 		else:
 			data = t.scaleRGB(data)
-			data = t.normalize(data, self.opt.ImNetMean, self.opt.ImNetStd)
+			data = t.normalize(data, self.opt.CSFMean, self.opt.CSFStd)
 			return data, xml			
 
 	def postprocessData(self):
 		def process(ipt):
 			processed = np.swapaxes(ipt, 0, 2)
 			processed = np.swapaxes(processed, 0, 1)
-			processed = t.unNormalize(processed, self.opt.ImNetMean, self.opt.ImNetStd)
+			processed = t.unNormalize(processed, self.opt.CSFMean, self.opt.CSFStd)
 			processed = t.unScaleRGB(processed)
 			return processed
 		return process

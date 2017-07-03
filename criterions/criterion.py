@@ -24,8 +24,6 @@ def createCriterion(opt, model):
 		criterion = nn.L1Loss()
 	elif opt.mseLoss != 0:
 		criterion = nn.MSELoss()
-	elif opt.ceLoss != 0:
-		criterion = nn.CrossEntropyLoss()
 	elif opt.gdlLoss != 0:
 		criterion = nn.GDLLoss()
 

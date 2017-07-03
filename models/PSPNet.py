@@ -66,17 +66,11 @@ class myModel(nn.Module):
 		)
 
 	def forward(self, x):
-		# print('x', x.size())
 		x = self.conv1(x)
-		# print('conv1', x.size())
 		x = self.layer1(x)
-		# print('layer1', x.size())
 		x = self.layer2(x)
-		# print('layer2', x.size())
 		x = self.layer3(x)
-		# print('layer3', x.size())
 		x = self.layer4(x)
-		# print('layer4', x.size())
 		x = torch.cat([
 			self.layer5a(x),
 			self.layer5b(x),
@@ -84,10 +78,8 @@ class myModel(nn.Module):
 			self.layer5d(x),
 			self.layer5e(x),
 		], 1)
-		# print('cated', x.size())
 		final = self.final(x)
 		upsize = ( int(x.size()[2]/self.opt.downRate), int(x.size()[3]/self.opt.downRate) )
-		#TODO: opt size and target xml size mismatch
 		final = F.upsample_bilinear(final, upsize )
 		return final
 

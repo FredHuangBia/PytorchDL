@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import math
 
 class CrossEntropyLoss2d(nn.Module):
 	def __init__(self, weight=None):
@@ -19,13 +20,8 @@ def initCriterion(criterion, model):
 def createCriterion(opt, model):
 	weight = torch.ones(opt.numClasses)
 	weight[19] = 0
-	# weight[5] = 2
-	# weight[6] = 2
-	# weight[7] = 2
-	# weight[11] = 2
-	# weight[12] = 2
-	# weight[17] = 2
-	# weight[18] = 2
+	for i in range(19):
+		weight[i] = 1 / math.log(opt.classRates[i] + 1.10)
 	criterion = CrossEntropyLoss2d(weight)
 
 	return criterion

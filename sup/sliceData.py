@@ -17,6 +17,9 @@ dataRate = 10
 pastTime = 2
 futurTime = 4
 
+if not os.path.exists(dataRoot):
+	os.makedirs(dataRoot)
+
 datasetPath = os.path.join(dataRoot,'EKF'+str(pastTime) )
 xmlRaw = open(os.path.join(dataRoot,'EKF'+str(pastTime) + '.txt'), 'w')
 

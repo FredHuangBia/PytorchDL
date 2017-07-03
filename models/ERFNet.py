@@ -202,9 +202,9 @@ class myModel(nn.Module):
 			return y
 		return y
 
+
 def createModel(opt):
 	model = myModel(opt)
 	if opt.GPU:
 		model = model.cuda()
 	return model
-

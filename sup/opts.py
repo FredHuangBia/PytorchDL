@@ -10,7 +10,7 @@ class opts:
 		# General options
 		parser.add_argument('--debug',           default=False,          type=bool,  help='Debug mode, only run 2 epochs' )
 		parser.add_argument('--manualSeed',      default=0,              type=int,   help='manual seed')
-		parser.add_argument('--GPU',             default=True,           type=bool,  help='Use GPU' )
+		parser.add_argument('--GPU',             default=False,          type=bool,  help='Use GPU' )
 		parser.add_argument('--GPUs',            default='0',            type=str,   help='ID of GPUs to use, seeperate by ,')
 		parser.add_argument('--backend',         default='cudnn',        type=str,   help='backend', choices=['cudnn', 'cunn'])
 		parser.add_argument('--cudnn',           default='fastest',      type=str,   help='cudnn setting', choices=['fastest', 'deterministic', 'default'])
