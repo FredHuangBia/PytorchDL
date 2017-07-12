@@ -51,7 +51,7 @@ class myTrainer():
 			loss.backward()
 			self.optimizer.step()
 
-			if len(targetXmls) < self.opt.visTrain:
+			if len(targetXmls) < self.opt.visBatch:
 				targetXmls.append(targetXml)
 				outputs.append(opt)
 		if epoch % self.opt.visEpoch == 0:
@@ -80,7 +80,7 @@ class myTrainer():
 			loss = self.criterion(opt, targetXml)
 			avgLoss = (avgLoss * i + loss.data[0]) / (i + 1)
 
-			if len(targetXmls) < self.opt.visVal:
+			if len(targetXmls) < self.opt.visBatch:
 				targetXmls.append(targetXml)
 				outputs.append(opt)
 		if epoch % self.opt.visEpoch == 0:

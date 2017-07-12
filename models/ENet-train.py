@@ -52,7 +52,7 @@ class myTrainer():
 			avgLoss = (avgLoss * i + loss.data[0]) / (i + 1)
 			self.optimizer.step()
 
-			if len(targetXmls) < self.opt.visTrain:
+			if len(targetXmls) < self.opt.visBatch:
 				inputs.append(ipt.cpu().data)
 				targetXmls.append(targetXml.cpu().data)
 				outputs.append(output.cpu().data)
@@ -88,7 +88,7 @@ class myTrainer():
 			loss = self.criterion(output, targetXml)
 			avgLoss = (avgLoss * i + loss.data[0]) / (i + 1)
 
-			if len(targetXmls) < self.opt.visVal:
+			if len(targetXmls) < self.opt.visBatch:
 				inputs.append(ipt.cpu().data)
 				targetXmls.append(targetXml.cpu().data)
 				outputs.append(output.cpu().data)
@@ -124,7 +124,7 @@ class myTrainer():
 			loss = self.criterion(output, targetXml)
 			avgLoss = (avgLoss * i + loss.data[0]) / (i + 1)
 
-			if len(targetXmls) < self.opt.visTest:
+			if len(targetXmls) < self.opt.visBatch:
 				inputs.append(ipt.cpu().data)
 				targetXmls.append(targetXml.cpu().data)
 				outputs.append(output.cpu().data)
