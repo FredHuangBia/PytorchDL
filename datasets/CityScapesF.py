@@ -45,8 +45,10 @@ class myDataset(Dataset):
 
 		xmlPath = self.dataInfo['xmlPath'][index]
 		xmlRaw = misc.imread(xmlPath)
-		if self.opt.encoderOnly:
+		if (self.opt.netType == 'ERFNet' or self.opt.netType == 'ERFNet2') and self.opt.encoderOnly:
 			xmlRaw = misc.imresize(xmlRaw, self.opt.downRate/8, interp='nearest')
+		elif self.opt.netType == 'PSPNet':
+			xmlRaw = misc.imresize(xmlRaw, 0.5, interp='nearest')
 		else:
 			xmlRaw = misc.imresize(xmlRaw, self.opt.downRate, interp='nearest')
 		xmlRaw = np.asarray(xmlRaw, dtype=np.int64)

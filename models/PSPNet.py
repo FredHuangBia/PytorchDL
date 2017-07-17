@@ -15,10 +15,7 @@ class PSPDec(nn.Module):
 		self.relu = nn.ReLU(inplace=True)
 
 	def forward(self, x):
-		if self.downsize == None:
-			downsize = (1,1)
-		else:
-			downsize = ( int(x.size()[2]/self.downsize[0]), int(x.size()[3]/self.downsize[1]) )
+		downsize = ( int(x.size()[2]/self.downsize[0]), int(x.size()[3]/self.downsize[1]) )
 		upsize = (x.size()[2], x.size()[3])
 
 		output = F.avg_pool2d(x, downsize, stride=downsize)
@@ -35,6 +32,8 @@ class myModel(nn.Module):
 
 		if opt.netSpec == 'resnet101':
 			resnet = models.resnet101(pretrained=opt.pretrain)
+		elif opt.netSpec == 'resnet50':
+			resnet = models.resnet50(pretrained=opt.pretrain)
 		elif opt.netSpec == 'resnet34':
 			resnet = models.resnet34(pretrained=opt.pretrain)
 
@@ -46,23 +45,22 @@ class myModel(nn.Module):
 
 		for m in self.modules():
 			if isinstance(m, nn.Conv2d):
-				m.stride = 1
+				# m.stride = 1
 				m.requires_grad = False
 			if isinstance(m, nn.BatchNorm2d):
 				m.requires_grad = False
 
 		self.layer5a = PSPDec(512, 128, (1,1))
-		self.layer5b = PSPDec(512, 128, (3,3))
-		self.layer5c = PSPDec(512, 128, (8,16))
-		self.layer5d = PSPDec(512, 128, (32,64))
-		self.layer5e = PSPDec(512, 128, None)
+		self.layer5b = PSPDec(512, 128, (2,2))
+		self.layer5c = PSPDec(512, 128, (3,3))
+		self.layer5d = PSPDec(512, 128, (6,6))
 
 		self.final = nn.Sequential(
-			nn.Conv2d(128*5, 128, 3, padding=1, bias=False),
-			nn.BatchNorm2d(128, momentum=.95),
+			nn.Conv2d(512*2, 512, 3, padding=1, bias=False),
+			nn.BatchNorm2d(512, momentum=.95),
 			nn.ReLU(inplace=True),
 			nn.Dropout(.1),
-			nn.Conv2d(128, opt.numClasses, 1),
+			nn.Conv2d(512, opt.numClasses, 1),
 		)
 
 	def forward(self, x):
@@ -71,20 +69,38 @@ class myModel(nn.Module):
 		x = self.layer2(x)
 		x = self.layer3(x)
 		x = self.layer4(x)
+
 		x = torch.cat([
 			self.layer5a(x),
 			self.layer5b(x),
 			self.layer5c(x),
 			self.layer5d(x),
-			self.layer5e(x),
+			x,
 		], 1)
-		final = self.final(x)
-		upsize = ( int(x.size()[2]/self.opt.downRate), int(x.size()[3]/self.opt.downRate) )
-		final = F.upsample_bilinear(final, upsize )
-		return final
+		x = self.final(x)
+
+		x = F.upsample_bilinear(x, (512, 1024) )
+		return x
+
+
+class myParallelModel(nn.Module):
+	def __init__(self, opt):
+		super().__init__()
+		self.opt = opt
+
+		self.model = myModel(opt)
+		self.model = nn.DataParallel(self.model, opt.GPUs)
+
+	def forward(self, x):
+		x = self.model(x)
+		return x
+
 
 def createModel(opt):
-	model = myModel(opt)
 	if opt.GPU:
+		if opt.nGPUs > 1:
+			model = myParallelModel(opt)
+		else:
+			model = myModel(opt)
 		model = model.cuda()
 	return model

@@ -25,12 +25,12 @@ class opts:
 		parser.add_argument('--trainPctg',       default=1.00,           type=float, help='Percentage of training images')
 		# Training/testing options
 		parser.add_argument('--nEpochs',         default=120,            type=int,   help='Number of total epochs to run')
-		parser.add_argument('--epochNum',        default=-2,             type=int,   help='0=retrain|-1=latest|-2=best', choices=[0,-1,-2])
+		parser.add_argument('--epochNum',        default=-2,              type=int,   help='0=retrain|-1=latest|-2=best', choices=[0,-1,-2])
 		parser.add_argument('--batchSize',       default=8,              type=int,   help='mini-batch size')
 		parser.add_argument('--saveEpoch',       default=999,            type=int,   help='saving at least # epochs')
 		parser.add_argument('--saveOne',         default=True,           type=bool,  help='Only preserve one saved model')
 		parser.add_argument('--valOnly',         default=False,          type=bool,  help='Run on validation set only')
-		parser.add_argument('--testOnly',        default=True,          type=bool,  help='Run the test to see the performance')
+		parser.add_argument('--testOnly',        default=False,          type=bool,  help='Run the test to see the performance')
 		parser.add_argument('--visEpoch',        default=10,             type=int,   help='Visualizing every n epochs')
 		parser.add_argument('--visBatch',        default=1,              type=int,   help='Number of examples to visualize, in unit of batchsize')
 		parser.add_argument('--visWidth',        default=1,              type=int,   help='Number of images per row for visualization')
@@ -44,8 +44,8 @@ class opts:
 		parser.add_argument('--dropout',         default=0.3,            type=float, help='zero rate of dropout')
 		parser.add_argument('--optimizer',       default='Adam',         type=str,   help='optimizer type, more choices available', choices=['SGD','Adam'])
 		# Model options
-		parser.add_argument('--netType',         default='ERFNet',       type=str,   help='Your defined model name', choices=['CNN5','MCCNN','PSPNet','ENet','ERFNet'])
-		parser.add_argument('--netSpec',         default='custom',       type=str,   help='Other model to be loaded', choices=['custom','resnet101','resnet34'])
+		parser.add_argument('--netType',         default='ERFNet2',      type=str,   help='Your defined model name', choices=['CNN5','MCCNN','PSPNet','ENet','ERFNet'])
+		parser.add_argument('--netSpec',         default='custom',       type=str,   help='Other model to be loaded', choices=['custom','resnet101','resnet50'])
 		parser.add_argument('--pretrain',        default=False,          type=bool,  help='Pretrained or not')
 		parser.add_argument('--L1Loss',          default=0,              type=float, help='Weight for abs criterion')
 		parser.add_argument('--mseLoss',         default=0,              type=float, help='Weight for mse criterion')
@@ -54,12 +54,12 @@ class opts:
 		# Other model options
 		parser.add_argument('--resetClassifier', default=False,          type=bool,  help='Reset the fully connected layer for fine-tuning')
 		parser.add_argument('--numClasses',      default=20,             type=int,   help='Number of classes in the dataset')
-		parser.add_argument('--suffix',          default='autoEncoder',  type=str,   help='Suffix for saving the model')
+		parser.add_argument('--suffix',          default='encoder',      type=str,   help='Suffix for saving the model')
 		self.args = parser.parse_args()
 
 	def __init__(self):
 		self.parse()
-		self.args.GPUs = self.args.GPUs.split(',')
+		self.args.GPUs = [int(i) for i in self.args.GPUs.split(',')]
 		self.args.nGPUs = len(self.args.GPUs)
 
 		torch.set_default_tensor_type('torch.FloatTensor')
@@ -98,6 +98,13 @@ class opts:
 			self.args.downRate = 0.5
 			self.args.encoderOnly = False
 			self.args.encoderPath = '/home/titan/Fred/segment/models/CityScapesF_ERFNet_custom_pretrain=False_Loss=0-0-0-1_LR=0.0005_Suffix=encoder/model_best.pth'
+
+		elif self.args.netType == 'ERFNet2':
+			self.args.prelus = False
+			self.args.downRate = 0.5
+			self.args.encoderOnly = True
+			self.args.encoderPath = '/home/titan/Fred/segment/models/CityScapesF_ERFNet2_custom_pretrain=False_Loss=0-0-0-1_LR=0.0005_Suffix=encoder/model_best.pth'
+
 
 		self.args.visPerInst = 4
 		if self.args.visWidth == -1:

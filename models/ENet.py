@@ -525,8 +525,24 @@ class ENet(nn.Module):
 			return self.decoder.forward(input)
 
 
+class myParallelModel(nn.Module):
+	def __init__(self, opt):
+		super().__init__()
+		self.opt = opt
+
+		self.model = myModel(opt)
+		self.model = nn.DataParallel(self.model, opt.GPUs)
+
+	def forward(self, x):
+		x = self.model(x)
+		return x
+
+
 def createModel(opt):
-	model = ENet(opt)
 	if opt.GPU:
+		if opt.nGPUs > 1:
+			model = myParallelModel(opt)
+		else:
+			model = myModel(opt)
 		model = model.cuda()
 	return model

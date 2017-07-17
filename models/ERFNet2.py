@@ -81,13 +81,27 @@ class upsampler(nn.Module):
 		super().__init__()
 		# inputStride = upsample and 2 or 1
 		self.deconv = nn.ConvTranspose2d(inChannel, outChannel, 3, stride=2, padding=1, output_padding=1)
-		self.bn = nn.BatchNorm2d(outChannel)
+		self.bn = nn.BatchNorm2d(outChannel, eps=1e-3)
 		self.nonLinear = nn.ReLU(True)
 
-	def forward(self, x):
+		self.conv1 = nn.Conv2d(outChannel*2, outChannel, 3, stride=1, padding=1)
+		self.bn1 = nn.BatchNorm2d(outChannel, eps=1e-3)
+		self.nonLinear1 = nn.ReLU(True)
+		self.conv2 = nn.Conv2d(outChannel, outChannel, 3, stride=1, padding=2, dilation=2)
+		self.bn2 = nn.BatchNorm2d(outChannel, eps=1e-3)
+		self.nonLinear2 = nn.ReLU(True)
+
+	def forward(self, x, mid):
 		y = self.deconv(x)
 		y = self.bn(y)
 		y = self.nonLinear(y)
+		y = torch.cat([y, mid], 1)
+		y = self.conv1(y)
+		y = self.bn1(y)
+		y = self.nonLinear1(y)
+		y = self.conv2(y)
+		y = self.bn2(y)
+		y = self.nonLinear2(y)
 
 		return y
 
@@ -119,12 +133,14 @@ class encoder(nn.Module):
 
 	def forward(self, x):
 		y = self.downsampler1(x)
+		mid1 = y.clone()
 		y = self.downsampler2(y)
 		y = self.conv1a(y)
 		y = self.conv1b(y)
 		y = self.conv1c(y)
 		y = self.conv1d(y)
 		y = self.conv1e(y)
+		mid2 = y.clone()
 		y = self.downsampler3(y)
 		y = self.conv2a(y)
 		y = self.conv2b(y)
@@ -135,7 +151,7 @@ class encoder(nn.Module):
 		y = self.conv3c(y)
 		y = self.conv3d(y)
 
-		return y
+		return y, mid1, mid2
 
 
 class encoderPred(nn.Module):
@@ -146,10 +162,10 @@ class encoderPred(nn.Module):
 		self.convFinal = nn.Conv2d(128, numClasses, 1, 1)
 
 	def forward(self, x):
-		y = self.encoder(x)
+		y,_,_ = self.encoder(x)
 		y = self.convFinal(y)
 
-		return y
+		return y, None, None
 
 
 class decoder(nn.Module):
@@ -166,11 +182,11 @@ class decoder(nn.Module):
 
 		self.convFinal = nn.ConvTranspose2d(16, numClasses, 2, stride=2)
 
-	def forward(self, x):
-		y = self.upsampler1(x)
+	def forward(self, x, mid1, mid2):
+		y = self.upsampler1(x, mid2)
 		y = self.conv1a(y)
 		y = self.conv1b(y)
-		y = self.upsampler2(y)
+		y = self.upsampler2(y, mid1)
 		y = self.conv2a(y)
 		y = self.conv2b(y)
 		y = self.convFinal(y)
@@ -196,9 +212,9 @@ class myModel(nn.Module):
 			self.Decoder = decoder(opt.numClasses, opt.prelus)			
 
 	def forward(self, x):
-		y = self.Encoder(x)
+		y, mid1, mid2 = self.Encoder(x)
 		if not self.encoderOnly:
-			y = self.Decoder(y)
+			y = self.Decoder(y, mid1, mid2)
 			return y
 		return y
 
