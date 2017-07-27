@@ -1,4 +1,3 @@
-"A modified ERFNet, which preserves more detail information but slightly slower"
 import torch.nn as nn
 import torch.backends.cudnn as cudnn
 import torch
@@ -78,25 +77,31 @@ class downsampler(nn.Module):
 
 
 class upsamplerA(nn.Module):
-	def __init__(self, inChannel, outChannel, midchannel):
+	def __init__(self, inChannel, outChannel):
 		super().__init__()
 		# inputStride = upsample and 2 or 1
 		self.deconv = nn.ConvTranspose2d(inChannel, outChannel, 3, stride=2, padding=1, output_padding=1)
 		self.bn = nn.BatchNorm2d(outChannel, eps=1e-3)
 		self.nonLinear = nn.ReLU(True)
-
-		self.conv1 = nn.Conv2d(midchannel, outChannel, 3, stride=1, padding=1)
+		self.scalar1 = nn.Parameter(torch.rand(1))
+		self.scalar2 = nn.Parameter(torch.rand(1))
+		
+		self.conv1a = nn.Conv2d(outChannel, outChannel, (3,1), stride=1, padding=(1,0))
+		self.nonLinear1a = nn.ReLU(True)
+		self.conv1b = nn.Conv2d(outChannel, outChannel, (1,3), stride=1, padding=(0,1))
 		self.bn1 = nn.BatchNorm2d(outChannel, eps=1e-3)
-		self.nonLinear1 = nn.ReLU(True)
+		self.nonLinear1b = nn.ReLU(True)
 
 	def forward(self, x, mid):
 		y = self.deconv(x)
+		y = y*self.scalar1.expand_as(y) + mid*self.scalar2.expand_as(y)
 		y = self.bn(y)
 		y = self.nonLinear(y)
-		y = torch.cat([y, mid], 1)
-		y = self.conv1(y)
+		y = self.conv1a(y)
+		y = self.nonLinear1a(y)
+		y = self.conv1b(y)
 		y = self.bn1(y)
-		y = self.nonLinear1(y)
+		y = self.nonLinear1b(y)
 
 		return y
 
@@ -115,7 +120,7 @@ class upsamplerB(nn.Module):
 
 		return y
 
-class encoder(nn.Module):
+class encoderA(nn.Module):
 	def __init__(self, prelus=False, dropout=0.3):
 		super().__init__()
 
@@ -126,87 +131,137 @@ class encoder(nn.Module):
 		self.conv1b = nonBt1d(64, 64, 3, dropout/10.0, prelus, 2)
 		self.conv1c = nonBt1d(64, 64, 3, dropout/10.0, prelus, 4)
 		self.conv1d = nonBt1d(64, 64, 3, dropout/10.0, prelus, 8)
-		self.conv1e = nonBt1d(64, 64, 3, dropout/10.0, prelus, 4)
-		self.conv1f = nonBt1d(64, 64, 3, dropout/10.0, prelus, 8)
-
-		self.downsampler3 = downsampler(64, 128, 3, dropout, False)
-
-		self.conv2a = nonBt1d(128, 128, 3, dropout/10.0, prelus, 1)
-		self.conv2b = nonBt1d(128, 128, 3, dropout/10.0, prelus, 2)
-
-		self.conv3a = nonBt1d(128, 128, 3, dropout, prelus, 2)
-		self.conv3b = nonBt1d(128, 128, 3, dropout, prelus, 4)
-		self.conv3c = nonBt1d(128, 128, 3, dropout, prelus, 8)
-		self.conv3d = nonBt1d(128, 128, 3, dropout, prelus, 16)
-
-		self.conv4a = nonBt1d(128, 128, 3, dropout, prelus, 2)
-		self.conv4b = nonBt1d(128, 128, 3, dropout, prelus, 4)
-		self.conv4c = nonBt1d(128, 128, 3, dropout, prelus, 8)
-		self.conv4d = nonBt1d(128, 128, 3, dropout, prelus, 16)
+		self.conv1e = nonBt1d(64, 64, 3, dropout/10.0, prelus, 16)
 
 	def forward(self, x):
 		y = self.downsampler1(x)
-		mid1 = y.clone()
 		y = self.downsampler2(y)
 		y = self.conv1a(y)
 		y = self.conv1b(y)
 		y = self.conv1c(y)
 		y = self.conv1d(y)
 		y = self.conv1e(y)
-		y = self.conv1f(y)
-		mid2 = y.clone()
-		y = self.downsampler3(y)
+
+		return y
+
+class encoderB(nn.Module):
+	def __init__(self, prelus=False, dropout=0.3):
+		super().__init__()
+
+		self.downsampler3 = downsampler(64, 128, 3, dropout, False)
+
+		self.conv2a = nonBt1d(128, 128, 3, dropout, prelus, 2)
+		self.conv2b = nonBt1d(128, 128, 3, dropout, prelus, 4)
+		self.conv2c = nonBt1d(128, 128, 3, dropout, prelus, 8)
+		self.conv2d = nonBt1d(128, 128, 3, dropout, prelus, 16)
+
+		self.conv3a = nonBt1d(128, 128, 3, dropout, prelus, 2)
+		self.conv3b = nonBt1d(128, 128, 3, dropout, prelus, 4)
+		self.conv3c = nonBt1d(128, 128, 3, dropout, prelus, 8)
+		self.conv3d = nonBt1d(128, 128, 3, dropout, prelus, 16)
+
+	def forward(self, x):
+		y = self.downsampler3(x)
 		y = self.conv2a(y)
 		y = self.conv2b(y)
+		y = self.conv2c(y)
+		y = self.conv2d(y)
 		y = self.conv3a(y)
 		y = self.conv3b(y)
 		y = self.conv3c(y)
 		y = self.conv3d(y)
-		y = self.conv4a(y)
-		y = self.conv4b(y)
-		y = self.conv4c(y)
-		y = self.conv4d(y)
 
-		return y, mid1, mid2
+		return y
 
-
-class encoderPred(nn.Module):
-	def __init__(self, numClasses, prelus=False, dropout=0.3):
+class encoderC(nn.Module):
+	def __init__(self, prelus=False, dropout=0.3):
 		super().__init__()
 
-		self.encoder = encoder(prelus, dropout)
-		self.convFinal = nn.Conv2d(128, numClasses, 1, 1)
+		self.downsampler4 = nn.MaxPool2d(2, stride=2)
+
+		self.conv4a = nonBt1d(128, 128, 3, dropout, prelus, 1)
+		self.conv4b = nonBt1d(128, 128, 3, dropout, prelus, 1)
 
 	def forward(self, x):
-		y,_,_ = self.encoder(x)
-		y = self.convFinal(y)
+		y = self.downsampler4(x)
+		y = self.conv4a(y)
+		y = self.conv4b(y)
 
-		return y, None, None
+		return y
 
+class encoder(nn.Module):
+	def __init__(self, prelus=False, dropout=0.3):
+		super().__init__()
+
+		self.encoder1 = encoderA(prelus, dropout)
+		self.encoder2 = encoderB(prelus, dropout)
+		self.encoder3 = encoderC(prelus, dropout)
+		self.encoder4 = encoderC(prelus, dropout)
+		self.encoder5 = encoderC(prelus, dropout)
+		self.encoder6 = encoderC(prelus, dropout)
+		self.encoder7 = encoderC(prelus, dropout)
+
+	def forward(self, x):
+		y = self.encoder1(x)
+		y1 = y.clone()
+		y = self.encoder2(y)
+		y2 = y.clone()
+		y = self.encoder3(y)
+		y3 = y.clone()
+		y = self.encoder4(y)
+		y4 = y.clone()
+		y = self.encoder5(y)
+		y5 = y.clone()
+		y = self.encoder6(y)
+		y6 = y.clone()
+		y = self.encoder7(y)
+
+		return y1, y2, y3, y4, y5, y6, y
 
 class decoder(nn.Module):
 	def __init__(self, numClasses, prelus=False):
 		super().__init__()
 
-		self.upsampler1 = upsamplerA(128, 64, 64*2)
-		self.conv1a = nonBt1d(64, 64, 3, 0.1, prelus, 2)
-		self.conv1b = nonBt1d(64, 64, 3, 0.1, prelus, 4)
+		self.upsampler7 = upsamplerA(128, 128)
+		self.conv7 = nonBt1d(128, 128, 3, 0.1, prelus, 1)
+		self.upsampler6 = upsamplerA(128, 128)
+		self.conv6 = nonBt1d(128, 128, 3, 0.1, prelus, 1)
+		self.upsampler5 = upsamplerA(128, 128)
+		self.conv5 = nonBt1d(128, 128, 3, 0.1, prelus, 1)
+		self.upsampler4 = upsamplerA(128, 128)
+		self.conv4 = nonBt1d(128, 128, 3, 0.1, prelus, 1)
+		self.upsampler3 = upsamplerA(128, 128)
+		self.conv3 = nonBt1d(128, 128, 3, 0.1, prelus, 1)
 
-		self.upsampler2 = upsamplerB(64, numClasses)
-		self.conv2a = nonBt1d(numClasses, numClasses, 3, 0.1, prelus, 2)
-		self.conv2b = nonBt1d(numClasses, numClasses, 3, 0.1, prelus, 4)
-		self.conv2c = nonBt1d(numClasses, numClasses, 3, 0.1, prelus, 8)
+		self.upsampler2 = upsamplerA(128, 64)
+		self.conv2a = nonBt1d(64, 64, 3, 0.1, prelus, 2)
+		self.conv2b = nonBt1d(64, 64, 3, 0.1, prelus, 4)
+
+		self.upsampler1 = upsamplerB(64, numClasses)
+		self.conv1a = nonBt1d(numClasses, numClasses, 3, 0.1, prelus, 2)
+		self.conv1b = nonBt1d(numClasses, numClasses, 3, 0.1, prelus, 4)
+		self.conv1c = nonBt1d(numClasses, numClasses, 3, 0.1, prelus, 8)
 
 		self.convFinal = nn.ConvTranspose2d(numClasses, numClasses, 2, stride=2)
 
-	def forward(self, x, mid1, mid2):
-		y = self.upsampler1(x, mid2)
-		y = self.conv1a(y)
-		y = self.conv1b(y)
-		y = self.upsampler2(y)
+	def forward(self, y1, y2, y3, y4, y5, y6, y7):
+		y = self.upsampler7(y7, y6)
+		y = self.conv7(y)
+		y = self.upsampler6(y, y5)
+		y = self.conv6(y)
+		y = self.upsampler5(y, y4)
+		y = self.conv5(y)
+		y = self.upsampler4(y, y3)
+		y = self.conv4(y)
+		y = self.upsampler3(y, y2)
+		y = self.conv3(y)
+		y = self.upsampler2(y, y1)
 		y = self.conv2a(y)
 		y = self.conv2b(y)
-		y = self.conv2c(y)
+		y = self.upsampler1(y)
+		y = self.conv1a(y)
+		y = self.conv1b(y)
+		y = self.conv1c(y)
 		y = self.convFinal(y)
 
 		return y
@@ -215,25 +270,12 @@ class decoder(nn.Module):
 class myModel(nn.Module):
 	def __init__(self, opt):
 		super().__init__()
-		self.encoderOnly = opt.encoderOnly
-
-		if self.encoderOnly:
-			self.Encoder = encoderPred(opt.numClasses, opt.prelus, opt.dropout)
-
-		elif opt.epochNum==0: #retrain combined model
-			EncoderPred = torch.load(opt.encoderPath)
-			self.Encoder = EncoderPred.Encoder.encoder
-			self.Decoder = decoder(opt.numClasses, opt.prelus)
-
-		elif not self.encoderOnly and not opt.epochNum==0:
-			self.Encoder = encoder(opt.prelus, opt.dropout)
-			self.Decoder = decoder(opt.numClasses, opt.prelus)			
+		self.Encoder = encoder(opt.prelus, opt.dropout)
+		self.Decoder = decoder(opt.numClasses, opt.prelus)	
 
 	def forward(self, x):
-		y, _, mid2 = self.Encoder(x)
-		if not self.encoderOnly:
-			y = self.Decoder(y, None, mid2)
-			return y
+		y1, y2, y3, y4, y5, y6, y7 = self.Encoder(x)
+		y = self.Decoder(y1, y2, y3, y4, y5, y6, y7)
 		return y
 
 

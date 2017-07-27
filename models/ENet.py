@@ -7,7 +7,7 @@ import torch
 import torch.optim
 import torch.nn as nn
 import torch.nn.functional as F
-
+import math
 
 ENCODER_PARAMS = [
 		{
@@ -530,7 +530,7 @@ class myParallelModel(nn.Module):
 		super().__init__()
 		self.opt = opt
 
-		self.model = myModel(opt)
+		self.model = ENet(opt)
 		self.model = nn.DataParallel(self.model, opt.GPUs)
 
 	def forward(self, x):
@@ -543,6 +543,6 @@ def createModel(opt):
 		if opt.nGPUs > 1:
 			model = myParallelModel(opt)
 		else:
-			model = myModel(opt)
+			model = ENet(opt)
 		model = model.cuda()
 	return model

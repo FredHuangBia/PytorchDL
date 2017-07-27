@@ -68,13 +68,16 @@ class myDataset(Dataset):
 
 	def preprocess(self, data, xml):
 		if self.split == 'train':
-			# data, xml = t.randomSizeCrop(data, xml, 0.8)
+			if (self.opt.netType == 'ERFNet' or self.opt.netType == 'ERFNet2'):
+				data, xml = t.randomCrop(data, xml, (512, 1024))
 			data, xml = t.randomFlip(data, xml)
 			data = t.scaleRGB(data)
 			# data = t.addNoise(data, 0, 0.005)
 			data = t.normalize(data, self.opt.CSFMean, self.opt.CSFStd)
 			return data, xml
 		else:
+			if (self.opt.netType == 'ERFNet' or self.opt.netType == 'ERFNet2'):
+				data, xml = t.randomCrop(data, xml, (512, 1024))
 			data = t.scaleRGB(data)
 			data = t.normalize(data, self.opt.CSFMean, self.opt.CSFStd)
 			return data, xml			

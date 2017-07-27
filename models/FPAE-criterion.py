@@ -10,7 +10,6 @@ class CrossEntropyLoss2d(nn.Module):
 
 	def forward(self, outputs, targets):
 		return self.loss(F.log_softmax(outputs), targets)
-		# return self.loss(outputs, targets)
 
 def initCriterion(criterion, model):
 	# if isinstance(criterion, nn.MultiCriterion) or isinstance(criterion, nn.ParallelCriterion):

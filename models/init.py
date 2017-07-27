@@ -28,7 +28,8 @@ def setup(opt, checkpoint):
 		cudnn.fastest = True
 		cudnn.benchmark = True
 	elif opt.cudnn == 'deterministic':
-		pass
+		cudnn.fastest = False
+		cudnn.benchmark = False
 		#TODO
 
 	if opt.nGPUs > 1:
