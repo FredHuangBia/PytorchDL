@@ -51,7 +51,7 @@ class myTrainer():
 			loss.backward()
 			self.optimizer.step()
 
-			if len(targetXmls) < self.opt.visTrain:
+			if len(targetXmls) < self.opt.visBatch:
 				targetXmls.append(targetXml)
 				outputs.append(opt)
 		if epoch % self.opt.visEpoch == 0:
@@ -80,7 +80,7 @@ class myTrainer():
 			loss = self.criterion(opt, targetXml)
 			avgLoss = (avgLoss * i + loss.data[0]) / (i + 1)
 
-			if len(targetXmls) < self.opt.visVal:
+			if len(targetXmls) < self.opt.visBatch:
 				targetXmls.append(targetXml)
 				outputs.append(opt)
 		if epoch % self.opt.visEpoch == 0:
@@ -94,7 +94,7 @@ class myTrainer():
 	def visualize(self, targetXmls, outputs, epoch, split, postprocessXml):
 		targetCaps = []
 		outputCaps = []
-		for i in range(self.opt.visVal):
+		for i in range(self.opt.visBatch):
 			XmlBatch = postprocessXml(targetXmls[i])
 			OptBatch = postprocessXml(outputs[i])
 			for j in range(self.opt.batchSize):

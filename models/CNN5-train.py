@@ -94,7 +94,7 @@ class myTrainer():
 	def visualize(self, targetXmls, outputs, epoch, split, postprocessXml):
 		targetCaps = []
 		outputCaps = []
-		for i in range(self.opt.visVal):
+		for i in range(self.opt.visBatch):
 			XmlBatch = postprocessXml(targetXmls[i])
 			OptBatch = postprocessXml(outputs[i])
 			for j in range(self.opt.batchSize):

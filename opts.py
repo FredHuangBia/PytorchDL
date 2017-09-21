@@ -136,4 +136,4 @@ class opts:
 		if not os.path.exists(self.args.resume):
 			os.makedirs(self.args.resume)
 		if not os.path.exists(self.args.www):
-			os.makedirs(self.args.www)
+os.makedirs(self.args.www)

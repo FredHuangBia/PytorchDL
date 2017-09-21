@@ -6,8 +6,8 @@ import datasets.init as datasets
 from torch.utils.data.dataloader import *
 
 class myDataLoader(DataLoader):
-	def __init__(self, dataset, batch_size=1, shuffle=False, sampler=None, num_workers=0, collate_fn=default_collate, pin_memory=False, drop_last=False):
-		DataLoader.__init__(self, dataset, batch_size, shuffle, sampler, num_workers, collate_fn, pin_memory, drop_last)
+	def __init__(self, dataset, batch_size=1, shuffle=False, sampler=None, batch_sampler=None, num_workers=0, collate_fn=default_collate, pin_memory=False, drop_last=False):
+		DataLoader.__init__(self, dataset, batch_size, shuffle, sampler, batch_sampler, num_workers, collate_fn, pin_memory, drop_last)
 
 
 def create(opt):

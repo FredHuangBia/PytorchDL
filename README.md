@@ -24,12 +24,13 @@ And 2 other python scripts:
 
 # Run the example
 First you need to make sure the python version is **python 3.5**
-Then install these libraries: **tqdm, numpy, pytorch**
+Then install these libraries: **tqdm, numpy, pytorch, scipy**
 ```sh
-$ pip3 install http://download.pytorch.org/whl/cu80/torch-0.1.12.post2-cp35-cp35m-linux_x86_64.whl 
+$ pip3 install http://download.pytorch.org/whl/cu80/torch-0.2.0.post3-cp35-cp35m-manylinux1_x86_64.whl 
 $ pip3 install torchvision
 $ pip3 install tqdm
 $ pip3 install numpy
+$ pip3 install scipy
 ```
 
 If any of the above failed during installation, please try again with 'sudo'.
